@@ -176,7 +176,7 @@ Setiap implementasi pattern mencakup:
 
 ## 👥 Kontributor
 
-- [Nama Anda]
+- 
 
 ## 📄 Lisensi
 
@@ -184,4 +184,4 @@ Proyek ini dibuat untuk keperluan tugas besar mata kuliah.
 
 ---
 
-*Dibuat dengan ❤️ untuk pembelajaran Design Patterns*
+*Dibuat untuk pembelajaran Design Patterns*
