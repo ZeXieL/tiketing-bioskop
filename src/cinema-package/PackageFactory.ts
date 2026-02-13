@@ -1,44 +1,13 @@
-/**
- * =============================================================================
- * ABSTRACT FACTORY PATTERN - Sistem Paket Bioskop
- * =============================================================================
- * 
- * PENJELASAN MASALAH:
- * Bioskop menawarkan paket lengkap yang terdiri dari tiket, snack, dan minuman.
- * Terdapat berbagai kategori paket (Regular, Premium) di mana setiap kategori
- * memiliki kombinasi produk yang konsisten. Misalnya, paket Premium selalu
- * berisi tiket VIP, snack premium, dan minuman premium. Tanpa design pattern,
- * pembuatan kombinasi produk yang konsisten akan sulit dijaga.
- * 
- * ALASAN PEMILIHAN:
- * Abstract Factory dipilih karena memungkinkan pembuatan keluarga produk
- * yang saling terkait (tiket, snack, minuman) tanpa menspesifikasi kelas
- * konkretnya. Pattern ini memastikan bahwa produk yang dibuat selalu kompatibel
- * dan konsisten dalam satu kategori.
- * 
- * PEMETAAN KE DOMAIN BIOSKOP:
- * - Abstract Factory: CinemaPackageFactory
- * - Concrete Factories: RegularPackageFactory, PremiumPackageFactory
- * - Abstract Products: PackageTicket, Snack, Drink
- * - Concrete Products: RegularTicket/VIPTicket, PopcornRegular/PopcornLarge, 
- *                      SodaRegular/SodaLarge
- * =============================================================================
- */
-
-/**
- * Abstract Product: PackageTicket
- * Interface untuk tiket dalam paket
- */
+// Abstract Product: PackageTicket
+// Interface untuk tiket dalam paket
 export interface PackageTicket {
     getName(): string;
     getPrice(): number;
     getDescription(): string;
 }
 
-/**
- * Abstract Product: Snack
- * Interface untuk snack dalam paket
- */
+// Abstract Product: Snack
+// Interface untuk snack dalam paket
 export interface Snack {
     getName(): string;
     getPrice(): number;
@@ -46,10 +15,8 @@ export interface Snack {
     getCalories(): number;
 }
 
-/**
- * Abstract Product: Drink
- * Interface untuk minuman dalam paket
- */
+// Abstract Product: Drink
+// Interface untuk minuman dalam paket
 export interface Drink {
     getName(): string;
     getPrice(): number;
@@ -57,9 +24,7 @@ export interface Drink {
     getVolume(): number; // dalam ml
 }
 
-/**
- * Abstract Product: Souvenir (khusus paket premium)
- */
+// Abstract Product: Souvenir (khusus paket premium)
 export interface Souvenir {
     getName(): string;
     getPrice(): number;
@@ -70,9 +35,7 @@ export interface Souvenir {
 // CONCRETE PRODUCTS - REGULAR PACKAGE
 // =============================================================================
 
-/**
- * Concrete Product: RegularPackageTicket
- */
+// Concrete Product: RegularPackageTicket
 export class RegularPackageTicket implements PackageTicket {
     getName(): string {
         return 'Tiket Regular';
@@ -87,9 +50,7 @@ export class RegularPackageTicket implements PackageTicket {
     }
 }
 
-/**
- * Concrete Product: PopcornRegular
- */
+// Concrete Product: PopcornRegular
 export class PopcornRegular implements Snack {
     getName(): string {
         return 'Popcorn Regular';
@@ -108,9 +69,7 @@ export class PopcornRegular implements Snack {
     }
 }
 
-/**
- * Concrete Product: SodaRegular
- */
+// Concrete Product: SodaRegular
 export class SodaRegular implements Drink {
     getName(): string {
         return 'Coca-Cola Regular';
@@ -133,9 +92,7 @@ export class SodaRegular implements Drink {
 // CONCRETE PRODUCTS - PREMIUM PACKAGE
 // =============================================================================
 
-/**
- * Concrete Product: VIPPackageTicket
- */
+// Concrete Product: VIPPackageTicket
 export class VIPPackageTicket implements PackageTicket {
     getName(): string {
         return 'Tiket VIP';
@@ -150,9 +107,7 @@ export class VIPPackageTicket implements PackageTicket {
     }
 }
 
-/**
- * Concrete Product: PopcornLarge
- */
+// Concrete Product: PopcornLarge
 export class PopcornLarge implements Snack {
     getName(): string {
         return 'Caramel Popcorn Large';
@@ -171,9 +126,7 @@ export class PopcornLarge implements Snack {
     }
 }
 
-/**
- * Concrete Product: SodaLarge
- */
+// Concrete Product: SodaLarge
 export class SodaLarge implements Drink {
     getName(): string {
         return 'Premium Soda Float';
@@ -192,9 +145,7 @@ export class SodaLarge implements Drink {
     }
 }
 
-/**
- * Concrete Product: MovieSouvenir
- */
+// Concrete Product: MovieSouvenir
 export class MovieSouvenir implements Souvenir {
     private movieTitle: string;
 
@@ -219,10 +170,8 @@ export class MovieSouvenir implements Souvenir {
 // ABSTRACT FACTORY
 // =============================================================================
 
-/**
- * Abstract Factory: CinemaPackageFactory
- * Mendefinisikan interface untuk membuat keluarga produk paket bioskop
- */
+// Abstract Factory: CinemaPackageFactory
+// Mendefinisikan interface untuk membuat keluarga produk paket bioskop
 export interface CinemaPackageFactory {
     createTicket(): PackageTicket;
     createSnack(): Snack;
@@ -232,10 +181,8 @@ export interface CinemaPackageFactory {
     getTotalPrice(): number;
 }
 
-/**
- * Concrete Factory: RegularPackageFactory
- * Membuat paket regular dengan produk-produk standar
- */
+// Concrete Factory: RegularPackageFactory
+// Membuat paket regular dengan produk-produk standar
 export class RegularPackageFactory implements CinemaPackageFactory {
     createTicket(): PackageTicket {
         return new RegularPackageTicket();
@@ -264,10 +211,8 @@ export class RegularPackageFactory implements CinemaPackageFactory {
     }
 }
 
-/**
- * Concrete Factory: PremiumPackageFactory
- * Membuat paket premium dengan produk-produk eksklusif
- */
+// Concrete Factory: PremiumPackageFactory
+// Membuat paket premium dengan produk-produk eksklusif
 export class PremiumPackageFactory implements CinemaPackageFactory {
     private movieTitle: string;
 
@@ -308,17 +253,13 @@ export class PremiumPackageFactory implements CinemaPackageFactory {
     }
 }
 
-/**
- * Enum untuk tipe paket
- */
+// Enum untuk tipe paket
 export enum PackageType {
     REGULAR = 'REGULAR',
     PREMIUM = 'PREMIUM'
 }
 
-/**
- * Class untuk mengelola dan menampilkan paket
- */
+// Class untuk mengelola dan menampilkan paket
 export class CinemaPackage {
     private factory: CinemaPackageFactory;
     private ticket: PackageTicket;
@@ -338,9 +279,7 @@ export class CinemaPackage {
         }
     }
 
-    /**
-     * Menampilkan detail paket lengkap
-     */
+    // Menampilkan detail paket lengkap
     displayPackage(): string {
         let output = `
 ╔══════════════════════════════════════════════════════════════╗
@@ -400,9 +339,7 @@ export class CinemaPackage {
     }
 }
 
-/**
- * Provider untuk mendapatkan factory berdasarkan tipe paket
- */
+// Provider untuk mendapatkan factory berdasarkan tipe paket
 export class PackageFactoryProvider {
     static getFactory(type: PackageType, movieTitle?: string): CinemaPackageFactory {
         switch (type) {

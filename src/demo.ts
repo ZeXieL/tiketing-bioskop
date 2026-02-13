@@ -1,31 +1,9 @@
-/**
- * =============================================================================
- * DEMO - Sistem Booking Bioskop dengan Design Patterns
- * =============================================================================
- * 
- * File ini mendemonstrasikan penggunaan 12 Design Patterns yang
- * diimplementasikan dalam sistem booking bioskop.
- * 
- * CREATIONAL PATTERNS:
- * 1. Factory Method - Pembuatan tiket berbagai tipe
- * 2. Abstract Factory - Paket bioskop dengan produk terkait
- * 3. Builder - Konstruksi booking yang kompleks
- * 4. Prototype - Cloning seat layout dan promo template
- * 
- * STRUCTURAL PATTERNS:
- * 5. Adapter - Integrasi payment gateway
- * 6. Decorator - Add-on tiket
- * 7. Facade - Simplified booking interface
- * 8. Proxy - Seat availability dengan caching
- * 
- * BEHAVIORAL PATTERNS:
- * 9. State - Status booking lifecycle
- * 10. Observer - Notification system
- * 11. Strategy - Metode pembayaran
- * 12. Command - Seat selection dengan undo/redo
- * 
- * =============================================================================
- */
+// DEMO - Sistem Booking Bioskop dengan Design Patterns
+// Demonstrasi penggunaan 12 Design Patterns dalam sistem booking bioskop.
+//
+// CREATIONAL PATTERNS: Factory Method, Abstract Factory, Builder, Prototype
+// STRUCTURAL PATTERNS: Adapter, Decorator, Facade, Proxy
+// BEHAVIORAL PATTERNS: State, Observer, Strategy, Command
 
 // ═══════════════════════════════════════════════════════════════════════════
 // IMPORTS
@@ -131,9 +109,7 @@ function printSubHeader(title: string): void {
 // DEMO FUNCTIONS
 // ═══════════════════════════════════════════════════════════════════════════
 
-/**
- * Demo 1: Factory Method Pattern
- */
+// Demo 1: Factory Method Pattern
 function demoFactoryMethod(): void {
     printHeader('1. FACTORY METHOD PATTERN - Pembuatan Tiket');
 
@@ -161,9 +137,7 @@ function demoFactoryMethod(): void {
     console.log('\n' + regularTicket.printTicket());
 }
 
-/**
- * Demo 2: Abstract Factory Pattern
- */
+// Demo 2: Abstract Factory Pattern
 function demoAbstractFactory(): void {
     printHeader('2. ABSTRACT FACTORY PATTERN - Paket Bioskop');
 
@@ -178,9 +152,7 @@ function demoAbstractFactory(): void {
     console.log(premiumPackage.displayPackage());
 }
 
-/**
- * Demo 3: Builder Pattern
- */
+// Demo 3: Builder Pattern
 function demoBuilder(): void {
     printHeader('3. BUILDER PATTERN - Konstruksi Booking');
 
@@ -214,9 +186,7 @@ function demoBuilder(): void {
     console.log(`Total: Rp ${comboBooking.getTotalPrice().toLocaleString()}`);
 }
 
-/**
- * Demo 4: Prototype Pattern
- */
+// Demo 4: Prototype Pattern
 function demoPrototype(): void {
     printHeader('4. PROTOTYPE PATTERN - Cloning Layout & Promo');
 
@@ -247,9 +217,7 @@ function demoPrototype(): void {
     }
 }
 
-/**
- * Demo 5: Adapter Pattern
- */
+// Demo 5: Adapter Pattern
 function demoAdapter(): void {
     printHeader('5. ADAPTER PATTERN - Payment Gateway Integration');
 
@@ -279,9 +247,7 @@ function demoAdapter(): void {
     console.log(`Message: ${bankResult.message}`);
 }
 
-/**
- * Demo 6: Decorator Pattern
- */
+// Demo 6: Decorator Pattern
 function demoDecorator(): void {
     printHeader('6. DECORATOR PATTERN - Ticket Add-ons');
 
@@ -317,9 +283,7 @@ function demoDecorator(): void {
     console.log(TicketDisplay.print(premiumTicket));
 }
 
-/**
- * Demo 7: Facade Pattern
- */
+// Demo 7: Facade Pattern
 function demoFacade(): void {
     printHeader('7. FACADE PATTERN - Simplified Booking Interface');
 
@@ -337,9 +301,7 @@ function demoFacade(): void {
     console.log('  - All complex subsystem interactions are hidden');
 }
 
-/**
- * Demo 8: Proxy Pattern
- */
+// Demo 8: Proxy Pattern
 function demoProxy(): void {
     printHeader('8. PROXY PATTERN - Seat Availability with Caching');
 
@@ -368,9 +330,7 @@ function demoProxy(): void {
     logs.forEach(log => console.log(`  [${log.timestamp.toLocaleTimeString()}] ${log.method}`));
 }
 
-/**
- * Demo 9: State Pattern
- */
+// Demo 9: State Pattern
 function demoState(): void {
     printHeader('9. STATE PATTERN - Booking Lifecycle');
 
@@ -400,9 +360,7 @@ function demoState(): void {
     console.log(booking.displayStateHistory());
 }
 
-/**
- * Demo 10: Observer Pattern
- */
+// Demo 10: Observer Pattern
 function demoObserver(): void {
     printHeader('10. OBSERVER PATTERN - Notification System');
 
@@ -446,9 +404,7 @@ function demoObserver(): void {
     });
 }
 
-/**
- * Demo 11: Strategy Pattern
- */
+// Demo 11: Strategy Pattern
 function demoStrategy(): void {
     printHeader('11. STRATEGY PATTERN - Payment Methods');
 
@@ -477,9 +433,7 @@ function demoStrategy(): void {
     ccProcessor.processPayment(150000, paymentData);
 }
 
-/**
- * Demo 12: Command Pattern
- */
+// Demo 12: Command Pattern
 function demoCommand(): void {
     printHeader('12. COMMAND PATTERN - Seat Selection with Undo/Redo');
 
@@ -559,16 +513,16 @@ function main(): void {
 ║  All 12 Design Patterns have been demonstrated successfully!                ║
 ║                                                                              ║
 ║  CREATIONAL PATTERNS:                                                        ║
-║    ✓ Factory Method    ✓ Abstract Factory                                    ║
-║    ✓ Builder           ✓ Prototype                                           ║
+║    - Factory Method    - Abstract Factory                                    ║
+║    - Builder           - Prototype                                           ║
 ║                                                                              ║
 ║  STRUCTURAL PATTERNS:                                                        ║
-║    ✓ Adapter           ✓ Decorator                                           ║
-║    ✓ Facade            ✓ Proxy                                               ║
+║    - Adapter           - Decorator                                           ║
+║    - Facade            - Proxy                                               ║
 ║                                                                              ║
 ║  BEHAVIORAL PATTERNS:                                                        ║
-║    ✓ State             ✓ Observer                                            ║
-║    ✓ Strategy          ✓ Command                                             ║
+║    - State             - Observer                                            ║
+║    - Strategy          - Command                                             ║
 ║                                                                              ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
     `);

@@ -1,11 +1,7 @@
-/**
- * Model Pengguna
- * Merepresentasikan data pengguna sistem pemesanan tiket
- */
+// Model Pengguna
+// Merepresentasikan data pengguna sistem pemesanan tiket
 
-/**
- * Tipe keanggotaan pengguna
- */
+// Tipe keanggotaan pengguna
 export enum MembershipType {
     REGULAR = 'REGULAR',
     SILVER = 'SILVER',
@@ -13,9 +9,7 @@ export enum MembershipType {
     PLATINUM = 'PLATINUM'
 }
 
-/**
- * Interface User
- */
+// Interface User
 export interface User {
     id: string;
     name: string;
@@ -24,9 +18,7 @@ export interface User {
     membership: MembershipType;
 }
 
-/**
- * Implementasi konkret User
- */
+// Implementasi konkret User
 export class UserImpl implements User {
     constructor(
         public id: string,
@@ -36,9 +28,7 @@ export class UserImpl implements User {
         public membership: MembershipType = MembershipType.REGULAR
     ) { }
 
-    /**
-     * Mendapatkan diskon berdasarkan membership
-     */
+    // Mendapatkan diskon berdasarkan membership
     getDiscountPercentage(): number {
         switch (this.membership) {
             case MembershipType.PLATINUM:
@@ -52,9 +42,7 @@ export class UserImpl implements User {
         }
     }
 
-    /**
-     * Upgrade membership
-     */
+    // Upgrade membership
     upgradeMembership(newMembership: MembershipType): void {
         this.membership = newMembership;
     }

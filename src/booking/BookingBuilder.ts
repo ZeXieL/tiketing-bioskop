@@ -1,29 +1,3 @@
-/**
- * =============================================================================
- * BUILDER PATTERN - Sistem Pembuatan Booking Kompleks
- * =============================================================================
- * 
- * PENJELASAN MASALAH:
- * Pemesanan tiket bioskop melibatkan banyak komponen opsional: pilihan kursi,
- * tambahan snack, asuransi tiket, voucher diskon, dan lainnya. Objek Booking
- * dapat memiliki berbagai konfigurasi. Tanpa design pattern, constructor
- * akan memiliki banyak parameter atau memerlukan banyak setter methods
- * yang membuat kode sulit dibaca dan rentan error.
- * 
- * ALASAN PEMILIHAN:
- * Builder Pattern dipilih karena memungkinkan konstruksi objek kompleks
- * secara bertahap menggunakan method chaining. Pattern ini memisahkan
- * konstruksi objek dari representasinya, memungkinkan berbagai konfigurasi
- * booking dengan kode yang readable.
- * 
- * PEMETAAN KE DOMAIN BIOSKOP:
- * - Product: Booking
- * - Builder Interface: BookingBuilder
- * - Concrete Builder: ConcreteBookingBuilder
- * - Director: BookingDirector (untuk konfigurasi umum)
- * =============================================================================
- */
-
 import { Movie, MovieImpl } from '../models/Movie';
 import { Cinema, Studio, StudioType, CinemaImpl, StudioImpl } from '../models/Cinema';
 import { User, UserImpl, MembershipType } from '../models/User';
@@ -31,9 +5,7 @@ import { Seat, SeatImpl, SeatType, SeatStatus } from '../models/Seat';
 import { Showtime, ShowtimeImpl } from '../models/Showtime';
 import { Ticket, TicketType, TicketFactoryProvider } from '../ticket/TicketFactory';
 
-/**
- * Enum status booking
- */
+// Enum status booking
 export enum BookingStatus {
     DRAFT = 'DRAFT',
     PENDING = 'PENDING',
@@ -43,19 +15,15 @@ export enum BookingStatus {
     CANCELLED = 'CANCELLED'
 }
 
-/**
- * Interface untuk add-on booking
- */
+// Interface untuk add-on booking
 export interface BookingAddon {
     name: string;
     price: number;
     quantity: number;
 }
 
-/**
- * Product: Booking
- * Objek kompleks yang dibangun oleh Builder
- */
+// Product: Booking
+// Objek kompleks yang dibangun oleh Builder
 export class Booking {
     // Properti wajib
     public id: string = '';
@@ -75,54 +43,40 @@ export class Booking {
     public createdAt: Date = new Date();
     public updatedAt: Date = new Date();
 
-    /**
-     * Menghitung subtotal tiket
-     */
+    // Menghitung subtotal tiket
     getTicketsSubtotal(): number {
         return this.tickets.reduce((sum, ticket) => sum + ticket.getPrice(), 0);
     }
 
-    /**
-     * Menghitung subtotal addon
-     */
+    // Menghitung subtotal addon
     getAddonsSubtotal(): number {
         return this.addons.reduce((sum, addon) => sum + (addon.price * addon.quantity), 0);
     }
 
-    /**
-     * Menghitung biaya asuransi (2% dari subtotal tiket)
-     */
+    // Menghitung biaya asuransi (2% dari subtotal tiket)
     getInsuranceFee(): number {
         if (!this.insuranceIncluded) return 0;
         return Math.round(this.getTicketsSubtotal() * 0.02);
     }
 
-    /**
-     * Menghitung total sebelum diskon
-     */
+    // Menghitung total sebelum diskon
     getSubtotal(): number {
         return this.getTicketsSubtotal() + this.getAddonsSubtotal() + this.getInsuranceFee();
     }
 
-    /**
-     * Mendapatkan persentase diskon dari membership user
-     */
+    // Mendapatkan persentase diskon dari membership user
     getMembershipDiscount(): number {
         if (!this.user) return 0;
         const discountPercentage = (this.user as UserImpl).getDiscountPercentage();
         return Math.round(this.getSubtotal() * discountPercentage / 100);
     }
 
-    /**
-     * Menghitung total akhir
-     */
+    // Menghitung total akhir
     getTotalPrice(): number {
         return this.getSubtotal() - this.discountAmount - this.getMembershipDiscount();
     }
 
-    /**
-     * Menampilkan ringkasan booking
-     */
+    // Menampilkan ringkasan booking
     displaySummary(): string {
         if (!this.showtime || !this.user) {
             return 'Booking belum lengkap';
@@ -196,10 +150,8 @@ export class Booking {
     }
 }
 
-/**
- * Builder Interface: BookingBuilder
- * Mendefinisikan langkah-langkah untuk membangun Booking
- */
+// Builder Interface: BookingBuilder
+// Mendefinisikan langkah-langkah untuk membangun Booking
 export interface BookingBuilder {
     reset(): BookingBuilder;
     setUser(user: User): BookingBuilder;
@@ -212,10 +164,8 @@ export interface BookingBuilder {
     build(): Booking;
 }
 
-/**
- * Concrete Builder: ConcreteBookingBuilder
- * Implementasi konkret dari BookingBuilder
- */
+// Concrete Builder: ConcreteBookingBuilder
+// Implementasi konkret dari BookingBuilder
 export class ConcreteBookingBuilder implements BookingBuilder {
     private booking: Booking;
 
@@ -224,9 +174,7 @@ export class ConcreteBookingBuilder implements BookingBuilder {
         this.reset();
     }
 
-    /**
-     * Reset builder ke state awal
-     */
+    // Reset builder ke state awal
     reset(): BookingBuilder {
         this.booking = new Booking();
         this.booking.id = this.generateBookingId();
@@ -235,27 +183,21 @@ export class ConcreteBookingBuilder implements BookingBuilder {
         return this;
     }
 
-    /**
-     * Set user yang melakukan booking
-     */
+    // Set user yang melakukan booking
     setUser(user: User): BookingBuilder {
         this.booking.user = user;
         this.booking.updatedAt = new Date();
         return this;
     }
 
-    /**
-     * Set showtime (jadwal tayang)
-     */
+    // Set showtime (jadwal tayang)
     setShowtime(showtime: Showtime): BookingBuilder {
         this.booking.showtime = showtime;
         this.booking.updatedAt = new Date();
         return this;
     }
 
-    /**
-     * Menambahkan kursi dan membuat tiket
-     */
+    // Menambahkan kursi dan membuat tiket
     addSeat(seat: Seat, ticketType: TicketType): BookingBuilder {
         if (!this.booking.showtime) {
             throw new Error('Showtime harus diset terlebih dahulu');
@@ -268,18 +210,14 @@ export class ConcreteBookingBuilder implements BookingBuilder {
         return this;
     }
 
-    /**
-     * Menambahkan addon (snack, merchandise, dll)
-     */
+    // Menambahkan addon (snack, merchandise, dll)
     addAddon(name: string, price: number, quantity: number): BookingBuilder {
         this.booking.addons.push({ name, price, quantity });
         this.booking.updatedAt = new Date();
         return this;
     }
 
-    /**
-     * Mengaplikasikan voucher diskon
-     */
+    // Mengaplikasikan voucher diskon
     applyVoucher(code: string, discountAmount: number): BookingBuilder {
         this.booking.voucherCode = code;
         this.booking.discountAmount = discountAmount;
@@ -287,27 +225,21 @@ export class ConcreteBookingBuilder implements BookingBuilder {
         return this;
     }
 
-    /**
-     * Menambahkan asuransi tiket
-     */
+    // Menambahkan asuransi tiket
     includeInsurance(): BookingBuilder {
         this.booking.insuranceIncluded = true;
         this.booking.updatedAt = new Date();
         return this;
     }
 
-    /**
-     * Menambahkan catatan
-     */
+    // Menambahkan catatan
     setNotes(notes: string): BookingBuilder {
         this.booking.notes = notes;
         this.booking.updatedAt = new Date();
         return this;
     }
 
-    /**
-     * Membangun dan mengembalikan objek Booking
-     */
+    // Membangun dan mengembalikan objek Booking
     build(): Booking {
         // Validasi booking
         if (!this.booking.user) {
@@ -328,9 +260,7 @@ export class ConcreteBookingBuilder implements BookingBuilder {
         return result;
     }
 
-    /**
-     * Generate unique booking ID
-     */
+    // Generate unique booking ID
     private generateBookingId(): string {
         const timestamp = Date.now().toString(36);
         const random = Math.random().toString(36).substring(2, 8);
@@ -338,10 +268,8 @@ export class ConcreteBookingBuilder implements BookingBuilder {
     }
 }
 
-/**
- * Director: BookingDirector
- * Menyediakan konfigurasi booking yang sering digunakan
- */
+// Director: BookingDirector
+// Menyediakan konfigurasi booking yang sering digunakan
 export class BookingDirector {
     private builder: BookingBuilder;
 
@@ -353,9 +281,7 @@ export class BookingDirector {
         this.builder = builder;
     }
 
-    /**
-     * Membuat booking standar (tiket saja)
-     */
+    // Membuat booking standar (tiket saja)
     buildBasicBooking(user: User, showtime: Showtime, seat: Seat): Booking {
         return this.builder
             .reset()
@@ -365,9 +291,7 @@ export class BookingDirector {
             .build();
     }
 
-    /**
-     * Membuat booking VIP dengan asuransi
-     */
+    // Membuat booking VIP dengan asuransi
     buildVIPBooking(user: User, showtime: Showtime, seat: Seat): Booking {
         return this.builder
             .reset()
@@ -378,9 +302,7 @@ export class BookingDirector {
             .build();
     }
 
-    /**
-     * Membuat booking lengkap dengan snack combo
-     */
+    // Membuat booking lengkap dengan snack combo
     buildComboBooking(
         user: User,
         showtime: Showtime,
@@ -398,9 +320,7 @@ export class BookingDirector {
             .build();
     }
 
-    /**
-     * Membuat booking keluarga (4 tiket + snack)
-     */
+    // Membuat booking keluarga (4 tiket + snack)
     buildFamilyBooking(
         user: User,
         showtime: Showtime,

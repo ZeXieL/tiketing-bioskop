@@ -1,32 +1,3 @@
-/**
- * =============================================================================
- * STRATEGY PATTERN - Sistem Metode Pembayaran Bioskop
- * =============================================================================
- * 
- * PENJELASAN MASALAH:
- * Sistem bioskop mendukung berbagai metode pembayaran (Credit Card, E-Wallet,
- * Bank Transfer, QRIS) dengan algoritma dan proses validasi yang berbeda.
- * Tanpa design pattern, kode pembayaran akan berisi switch-case besar yang
- * sulit di-maintain dan melanggar Open/Closed Principle.
- * 
- * ALASAN PEMILIHAN:
- * Strategy Pattern dipilih untuk mengenkapsulasi setiap algoritma pembayaran
- * dalam class terpisah. Client dapat memilih strategi pembayaran saat runtime
- * tanpa mengubah kode context. Mudah menambahkan metode pembayaran baru.
- * 
- * PEMETAAN KE DOMAIN BIOSKOP:
- * - Strategy Interface: PaymentStrategy
- * - Concrete Strategies: CreditCardStrategy, EWalletStrategy, 
- *                        BankTransferStrategy, QRISStrategy
- * - Context: PaymentProcessor
- * =============================================================================
- */
-
-/**
- * ═══════════════════════════════════════════════════════════════
- * STRATEGY RESULTS
- * ═══════════════════════════════════════════════════════════════
- */
 export interface PaymentResult {
     success: boolean;
     transactionId: string;
@@ -45,46 +16,28 @@ export interface ValidationResult {
     errors: string[];
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * STRATEGY INTERFACE
- * ═══════════════════════════════════════════════════════════════
- */
+// STRATEGY INTERFACE
 export interface PaymentStrategy {
-    /**
-     * Nama metode pembayaran
-     */
+    // Nama metode pembayaran
     getName(): string;
 
-    /**
-     * Mendapatkan deskripsi singkat
-     */
+    // Mendapatkan deskripsi singkat
     getDescription(): string;
 
-    /**
-     * Menghitung biaya admin (fee)
-     */
+    // Menghitung biaya admin (fee)
     calculateFee(amount: number): number;
 
-    /**
-     * Validasi data pembayaran
-     */
+    // Validasi data pembayaran
     validate(paymentData: PaymentData): ValidationResult;
 
-    /**
-     * Proses pembayaran
-     */
+    // Proses pembayaran
     processPayment(amount: number, paymentData: PaymentData): PaymentResult;
 
-    /**
-     * Mendapatkan icon untuk UI
-     */
+    // Mendapatkan icon untuk UI
     getIcon(): string;
 }
 
-/**
- * Data pembayaran generik
- */
+// Data pembayaran generik
 export interface PaymentData {
     // Credit Card
     cardNumber?: string;
@@ -108,11 +61,7 @@ export interface PaymentData {
     customerName?: string;
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONCRETE STRATEGY 1: CreditCardStrategy
- * ═══════════════════════════════════════════════════════════════
- */
+// CONCRETE STRATEGY 1: CreditCardStrategy
 export class CreditCardStrategy implements PaymentStrategy {
     private readonly ADMIN_FEE_PERCENTAGE = 0.025; // 2.5%
     private readonly MIN_FEE = 5000;
@@ -126,7 +75,7 @@ export class CreditCardStrategy implements PaymentStrategy {
     }
 
     getIcon(): string {
-        return '💳';
+        return '[CC]';
     }
 
     calculateFee(amount: number): number {
@@ -229,11 +178,7 @@ export class CreditCardStrategy implements PaymentStrategy {
     }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONCRETE STRATEGY 2: EWalletStrategy
- * ═══════════════════════════════════════════════════════════════
- */
+// CONCRETE STRATEGY 2: EWalletStrategy
 export enum EWalletType {
     GOPAY = 'GoPay',
     OVO = 'OVO',
@@ -260,11 +205,11 @@ export class EWalletStrategy implements PaymentStrategy {
 
     getIcon(): string {
         const icons: Record<EWalletType, string> = {
-            [EWalletType.GOPAY]: '🟢',
-            [EWalletType.OVO]: '🟣',
-            [EWalletType.DANA]: '🔵',
-            [EWalletType.SHOPEEPAY]: '🟠',
-            [EWalletType.LINKAJA]: '🔴'
+            [EWalletType.GOPAY]: '[GoPay]',
+            [EWalletType.OVO]: '[OVO]',
+            [EWalletType.DANA]: '[DANA]',
+            [EWalletType.SHOPEEPAY]: '[ShopeePay]',
+            [EWalletType.LINKAJA]: '[LinkAja]'
         };
         return icons[this.walletType];
     }
@@ -333,11 +278,7 @@ export class EWalletStrategy implements PaymentStrategy {
     }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONCRETE STRATEGY 3: BankTransferStrategy
- * ═══════════════════════════════════════════════════════════════
- */
+// CONCRETE STRATEGY 3: BankTransferStrategy
 export enum BankCode {
     BCA = 'BCA',
     BNI = 'BNI',
@@ -364,7 +305,7 @@ export class BankTransferStrategy implements PaymentStrategy {
     }
 
     getIcon(): string {
-        return '🏦';
+        return '[Bank]';
     }
 
     calculateFee(amount: number): number {
@@ -460,11 +401,7 @@ export class BankTransferStrategy implements PaymentStrategy {
     }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONCRETE STRATEGY 4: QRISStrategy
- * ═══════════════════════════════════════════════════════════════
- */
+// CONCRETE STRATEGY 4: QRISStrategy
 export class QRISStrategy implements PaymentStrategy {
     private readonly MDR_FEE_PERCENTAGE = 0.007; // 0.7% MDR
 
@@ -477,7 +414,7 @@ export class QRISStrategy implements PaymentStrategy {
     }
 
     getIcon(): string {
-        return '📱';
+        return '[QRIS]';
     }
 
     calculateFee(amount: number): number {
@@ -529,11 +466,7 @@ export class QRISStrategy implements PaymentStrategy {
     }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONTEXT: PaymentProcessor
- * ═══════════════════════════════════════════════════════════════
- */
+// CONTEXT: PaymentProcessor
 export class PaymentProcessor {
     private strategy: PaymentStrategy;
     private transactionHistory: PaymentResult[] = [];
@@ -543,24 +476,18 @@ export class PaymentProcessor {
         console.log(`[PaymentProcessor] Initialized with ${strategy.getName()}`);
     }
 
-    /**
-     * Mengubah strategi pembayaran
-     */
+    // Mengubah strategi pembayaran
     setStrategy(strategy: PaymentStrategy): void {
         this.strategy = strategy;
         console.log(`[PaymentProcessor] Strategy changed to ${strategy.getName()}`);
     }
 
-    /**
-     * Mendapatkan strategi saat ini
-     */
+    // Mendapatkan strategi saat ini
     getStrategy(): PaymentStrategy {
         return this.strategy;
     }
 
-    /**
-     * Memproses pembayaran dengan strategi yang dipilih
-     */
+    // Memproses pembayaran dengan strategi yang dipilih
     processPayment(amount: number, paymentData: PaymentData): PaymentResult {
         console.log('\n═══════════════════════════════════════════════════════════════');
         console.log(`PAYMENT PROCESSING`);
@@ -574,16 +501,14 @@ export class PaymentProcessor {
         this.transactionHistory.push(result);
 
         console.log('\n───────────────────────────────────────────────────────────────');
-        console.log(`Result: ${result.success ? '✅ SUCCESS' : '❌ FAILED'}`);
+        console.log(`Result: ${result.success ? 'SUCCESS' : 'FAILED'}`);
         console.log(`Message: ${result.message}`);
         console.log('═══════════════════════════════════════════════════════════════\n');
 
         return result;
     }
 
-    /**
-     * Preview fee sebelum proses
-     */
+    // Preview fee sebelum proses
     previewFee(amount: number): { amount: number; fee: number; total: number; method: string } {
         const fee = this.strategy.calculateFee(amount);
         return {
@@ -594,16 +519,12 @@ export class PaymentProcessor {
         };
     }
 
-    /**
-     * Mendapatkan history transaksi
-     */
+    // Mendapatkan history transaksi
     getTransactionHistory(): PaymentResult[] {
         return [...this.transactionHistory];
     }
 
-    /**
-     * Menampilkan daftar metode pembayaran
-     */
+    // Menampilkan daftar metode pembayaran
     static displayAvailableMethods(): string {
         const strategies: PaymentStrategy[] = [
             new CreditCardStrategy(),

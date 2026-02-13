@@ -1,67 +1,38 @@
-/**
- * =============================================================================
- * COMMAND PATTERN - Sistem Pemilihan Kursi dengan Undo/Redo
- * =============================================================================
- * 
- * PENJELASAN MASALAH:
- * Proses pemilihan kursi bioskop memungkinkan pengguna untuk:
- * - Memilih dan membatalkan pilihan kursi berkali-kali
- * - Melakukan undo (membatalkan pilihan terakhir)
- * - Melakukan redo (mengulangi pilihan yang dibatalkan)
- * 
- * Tanpa design pattern, implementasi undo/redo akan memerlukan tracking
- * state manual yang kompleks dan mudah error.
- * 
- * ALASAN PEMILIHAN:
- * Command Pattern dipilih untuk mengenkapsulasi setiap aksi pemilihan kursi
- * sebagai objek command. Setiap command menyimpan informasi yang diperlukan
- * untuk execute dan undo. History command memungkinkan implementasi
- * undo/redo yang clean.
- * 
- * PEMETAAN KE DOMAIN BIOSKOP:
- * - Command Interface: SeatCommand
- * - Concrete Commands: SelectSeatCommand, DeselectSeatCommand, 
- *                      SelectMultipleSeatsCommand
- * - Receiver: SeatManager
- * - Invoker: SeatSelectionInvoker
- * =============================================================================
- */
+// COMMAND PATTERN - Sistem Pemilihan Kursi dengan Undo/Redo
+//
+// PENJELASAN MASALAH:
+// Proses pemilihan kursi bioskop memungkinkan pengguna untuk memilih, membatalkan, undo, dan redo.
+// Tanpa design pattern, implementasi undo/redo akan memerlukan tracking state manual yang kompleks.
+//
+// SOLUSI:
+// Command Pattern mengenkapsulasi setiap aksi pemilihan kursi sebagai objek command.
+// Setiap command menyimpan informasi yang diperlukan untuk execute dan undo.
+//
+// PEMETAAN KE DOMAIN BIOSKOP:
+// - Command Interface: SeatCommand
+// - Concrete Commands: SelectSeatCommand, DeselectSeatCommand, SelectMultipleSeatsCommand
+// - Receiver: SeatManager
+// - Invoker: SeatSelectionInvoker
 
 import { Seat, SeatImpl, SeatType, SeatStatus } from '../models/Seat';
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * COMMAND INTERFACE
- * ═══════════════════════════════════════════════════════════════
- */
+// COMMAND INTERFACE
 export interface SeatCommand {
-    /**
-     * Menjalankan command
-     */
+    // Menjalankan command
     execute(): boolean;
 
-    /**
-     * Membatalkan command (undo)
-     */
+    // Membatalkan command (undo)
     undo(): boolean;
 
-    /**
-     * Mendapatkan deskripsi command untuk logging
-     */
+    // Mendapatkan deskripsi command untuk logging
     getDescription(): string;
 
-    /**
-     * Mendapatkan timestamp eksekusi
-     */
+    // Mendapatkan timestamp eksekusi
     getTimestamp(): Date | null;
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * RECEIVER: SeatManager
- * ═══════════════════════════════════════════════════════════════
- * Class yang melakukan operasi sebenarnya pada kursi
- */
+// RECEIVER: SeatManager
+// Class yang melakukan operasi sebenarnya pada kursi
 export class SeatManager {
     private seats: Map<string, Seat> = new Map();
     private selectedSeats: Set<string> = new Set();
@@ -70,10 +41,8 @@ export class SeatManager {
         console.log('[SeatManager] Initialized');
     }
 
-    /**
-     * Inisialisasi kursi untuk showtime tertentu
-     */
-    initializeSeats(showtimeId: string, rows: number, seatsPerRow: number, basePrice: number): void {
+    // Inisialisasi kursi untuk showtime tertentu
+    initializeSeats(showtimeId: string, rows: number, seatsPerRow: number, basePrice: number, allowRandomBooking: boolean = true): void {
         const rowLabels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
         for (let r = 0; r < rows; r++) {
@@ -85,7 +54,7 @@ export class SeatManager {
                 const price = seatType === SeatType.VIP ? basePrice * 1.5 : basePrice;
 
                 // Simulasi kursi sudah terisi random
-                const isBooked = Math.random() < 0.15; // 15% already booked
+                const isBooked = allowRandomBooking && Math.random() < 0.15; // 15% already booked
 
                 this.seats.set(seatCode, new SeatImpl(
                     seatId,
@@ -101,16 +70,12 @@ export class SeatManager {
         console.log(`[SeatManager] Initialized ${rows * seatsPerRow} seats`);
     }
 
-    /**
-     * Mendapatkan kursi berdasarkan kode
-     */
+    // Mendapatkan kursi berdasarkan kode
     getSeat(seatCode: string): Seat | undefined {
         return this.seats.get(seatCode);
     }
 
-    /**
-     * Memilih kursi
-     */
+    // Memilih kursi
     selectSeat(seatCode: string): boolean {
         const seat = this.seats.get(seatCode);
         if (!seat) {
@@ -129,9 +94,7 @@ export class SeatManager {
         return true;
     }
 
-    /**
-     * Membatalkan pilihan kursi
-     */
+    // Membatalkan pilihan kursi
     deselectSeat(seatCode: string): boolean {
         const seat = this.seats.get(seatCode);
         if (!seat) {
@@ -150,9 +113,7 @@ export class SeatManager {
         return true;
     }
 
-    /**
-     * Mendapatkan kursi yang dipilih
-     */
+    // Mendapatkan kursi yang dipilih
     getSelectedSeats(): Seat[] {
         const selected: Seat[] = [];
         for (const code of this.selectedSeats) {
@@ -162,30 +123,22 @@ export class SeatManager {
         return selected;
     }
 
-    /**
-     * Mendapatkan total harga kursi yang dipilih
-     */
+    // Mendapatkan total harga kursi yang dipilih
     getSelectedSeatsTotal(): number {
         return this.getSelectedSeats().reduce((sum, seat) => sum + seat.price, 0);
     }
 
-    /**
-     * Mendapatkan semua kursi
-     */
+    // Mendapatkan semua kursi
     getAllSeats(): Seat[] {
         return Array.from(this.seats.values());
     }
 
-    /**
-     * Mendapatkan kursi yang tersedia
-     */
+    // Mendapatkan kursi yang tersedia
     getAvailableSeats(): Seat[] {
         return this.getAllSeats().filter(seat => seat.status === SeatStatus.AVAILABLE);
     }
 
-    /**
-     * Mengkonfirmasi booking (mengubah SELECTED menjadi BOOKED)
-     */
+    // Mengkonfirmasi booking (mengubah SELECTED menjadi BOOKED)
     confirmBooking(): boolean {
         if (this.selectedSeats.size === 0) {
             console.log('[SeatManager] No seats to confirm');
@@ -205,9 +158,7 @@ export class SeatManager {
         return true;
     }
 
-    /**
-     * Menampilkan layout kursi
-     */
+    // Menampilkan layout kursi
     displayLayout(): string {
         if (this.seats.size === 0) return 'No seats initialized';
 
@@ -264,11 +215,7 @@ export class SeatManager {
     }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONCRETE COMMAND 1: SelectSeatCommand
- * ═══════════════════════════════════════════════════════════════
- */
+// CONCRETE COMMAND 1: SelectSeatCommand
 export class SelectSeatCommand implements SeatCommand {
     private seatManager: SeatManager;
     private seatCode: string;
@@ -316,11 +263,7 @@ export class SelectSeatCommand implements SeatCommand {
     }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONCRETE COMMAND 2: DeselectSeatCommand
- * ═══════════════════════════════════════════════════════════════
- */
+// CONCRETE COMMAND 2: DeselectSeatCommand
 export class DeselectSeatCommand implements SeatCommand {
     private seatManager: SeatManager;
     private seatCode: string;
@@ -368,12 +311,8 @@ export class DeselectSeatCommand implements SeatCommand {
     }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONCRETE COMMAND 3: SelectMultipleSeatsCommand
- * ═══════════════════════════════════════════════════════════════
- * Composite command untuk memilih beberapa kursi sekaligus
- */
+// CONCRETE COMMAND 3: SelectMultipleSeatsCommand
+// Composite command untuk memilih beberapa kursi sekaligus
 export class SelectMultipleSeatsCommand implements SeatCommand {
     private seatManager: SeatManager;
     private seatCodes: string[];
@@ -437,12 +376,8 @@ export class SelectMultipleSeatsCommand implements SeatCommand {
     }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * INVOKER: SeatSelectionInvoker
- * ═══════════════════════════════════════════════════════════════
- * Mengelola eksekusi command dan history untuk undo/redo
- */
+// INVOKER: SeatSelectionInvoker
+// Mengelola eksekusi command dan history untuk undo/redo
 export class SeatSelectionInvoker {
     private undoStack: SeatCommand[] = [];
     private redoStack: SeatCommand[] = [];
@@ -453,9 +388,7 @@ export class SeatSelectionInvoker {
         console.log('[SeatSelectionInvoker] Initialized');
     }
 
-    /**
-     * Menjalankan command
-     */
+    // Menjalankan command
     executeCommand(command: SeatCommand): boolean {
         const success = command.execute();
 
@@ -472,9 +405,7 @@ export class SeatSelectionInvoker {
         return success;
     }
 
-    /**
-     * Undo command terakhir
-     */
+    // Undo command terakhir
     undo(): boolean {
         if (this.undoStack.length === 0) {
             console.log('[Invoker] Nothing to undo');
@@ -492,9 +423,7 @@ export class SeatSelectionInvoker {
         return success;
     }
 
-    /**
-     * Redo command terakhir yang di-undo
-     */
+    // Redo command terakhir yang di-undo
     redo(): boolean {
         if (this.redoStack.length === 0) {
             console.log('[Invoker] Nothing to redo');
@@ -512,37 +441,27 @@ export class SeatSelectionInvoker {
         return success;
     }
 
-    /**
-     * Mengecek apakah undo tersedia
-     */
+    // Mengecek apakah undo tersedia
     canUndo(): boolean {
         return this.undoStack.length > 0;
     }
 
-    /**
-     * Mengecek apakah redo tersedia
-     */
+    // Mengecek apakah redo tersedia
     canRedo(): boolean {
         return this.redoStack.length > 0;
     }
 
-    /**
-     * Mendapatkan jumlah command di undo stack
-     */
+    // Mendapatkan jumlah command di undo stack
     getUndoCount(): number {
         return this.undoStack.length;
     }
 
-    /**
-     * Mendapatkan jumlah command di redo stack
-     */
+    // Mendapatkan jumlah command di redo stack
     getRedoCount(): number {
         return this.redoStack.length;
     }
 
-    /**
-     * Mendapatkan history command
-     */
+    // Mendapatkan history command
     getHistory(): string[] {
         return this.undoStack.map(cmd => {
             const ts = cmd.getTimestamp();
@@ -551,18 +470,14 @@ export class SeatSelectionInvoker {
         });
     }
 
-    /**
-     * Clear semua history
-     */
+    // Clear semua history
     clearHistory(): void {
         this.undoStack = [];
         this.redoStack = [];
         console.log('[Invoker] History cleared');
     }
 
-    /**
-     * Menampilkan status undo/redo
-     */
+    // Menampilkan status undo/redo
     displayStatus(): string {
         return `
 ╔══════════════════════════════════════════════════════════════╗
@@ -577,12 +492,8 @@ ${this.getHistory().slice(-5).map(h => `║   ${h.padEnd(58)}║`).join('\n') ||
     }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * SEAT SELECTION CONTROLLER
- * ═══════════════════════════════════════════════════════════════
- * Facade yang menggabungkan semua komponen
- */
+// SEAT SELECTION CONTROLLER
+// Facade yang menggabungkan semua komponen
 export class SeatSelectionController {
     private seatManager: SeatManager;
     private invoker: SeatSelectionInvoker;
@@ -592,97 +503,71 @@ export class SeatSelectionController {
         this.invoker = new SeatSelectionInvoker();
     }
 
-    /**
-     * Inisialisasi untuk showtime
-     */
-    initializeForShowtime(showtimeId: string, rows: number = 10, seatsPerRow: number = 15, basePrice: number = 50000): void {
-        this.seatManager.initializeSeats(showtimeId, rows, seatsPerRow, basePrice);
+    // Inisialisasi untuk showtime
+    initializeForShowtime(showtimeId: string, rows: number = 10, seatsPerRow: number = 15, basePrice: number = 50000, allowRandomBooking: boolean = true): void {
+        this.seatManager.initializeSeats(showtimeId, rows, seatsPerRow, basePrice, allowRandomBooking);
         this.invoker.clearHistory();
     }
 
-    /**
-     * Pilih kursi
-     */
+    // Pilih kursi
     selectSeat(seatCode: string): boolean {
         const command = new SelectSeatCommand(this.seatManager, seatCode);
         return this.invoker.executeCommand(command);
     }
 
-    /**
-     * Batalkan pilihan kursi
-     */
+    // Batalkan pilihan kursi
     deselectSeat(seatCode: string): boolean {
         const command = new DeselectSeatCommand(this.seatManager, seatCode);
         return this.invoker.executeCommand(command);
     }
 
-    /**
-     * Pilih beberapa kursi sekaligus
-     */
+    // Pilih beberapa kursi sekaligus
     selectMultipleSeats(seatCodes: string[]): boolean {
         const command = new SelectMultipleSeatsCommand(this.seatManager, seatCodes);
         return this.invoker.executeCommand(command);
     }
 
-    /**
-     * Undo
-     */
+    // Undo
     undo(): boolean {
         return this.invoker.undo();
     }
 
-    /**
-     * Redo
-     */
+    // Redo
     redo(): boolean {
         return this.invoker.redo();
     }
 
-    /**
-     * Konfirmasi booking
-     */
+    // Konfirmasi booking
     confirmBooking(): boolean {
         return this.seatManager.confirmBooking();
     }
 
-    /**
-     * Mendapatkan kursi yang dipilih
-     */
+    // Mendapatkan kursi yang dipilih
     getSelectedSeats(): Seat[] {
         return this.seatManager.getSelectedSeats();
     }
 
-    /**
-     * Mendapatkan total harga
-     */
+    // Mendapatkan total harga
     getTotal(): number {
         return this.seatManager.getSelectedSeatsTotal();
     }
 
-    /**
-     * Tampilkan layout
-     */
+    // Tampilkan layout
     displayLayout(): string {
         return this.seatManager.displayLayout();
     }
 
-    /**
-     * Tampilkan status undo/redo
-     */
+    // Tampilkan status undo/redo
     displayHistory(): string {
         return this.invoker.displayStatus();
     }
 
-    /**
-     * Check undo availability
-     */
+    // Check undo availability
     canUndo(): boolean {
         return this.invoker.canUndo();
     }
 
-    /**
-     * Check redo availability
-     */
+    // Check redo availability
     canRedo(): boolean {
         return this.invoker.canRedo();
     }

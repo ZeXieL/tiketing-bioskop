@@ -1,11 +1,7 @@
-/**
- * Model Bioskop dan Studio
- * Merepresentasikan data bioskop beserta studio-studionya
- */
+// Model Bioskop dan Studio
+// Merepresentasikan data bioskop beserta studio-studionya
 
-/**
- * Tipe studio yang tersedia
- */
+// Tipe studio yang tersedia
 export enum StudioType {
     REGULAR = 'REGULAR',
     VIP = 'VIP',
@@ -13,9 +9,7 @@ export enum StudioType {
     DOLBY_ATMOS = 'DOLBY_ATMOS'
 }
 
-/**
- * Interface Studio
- */
+// Interface Studio
 export interface Studio {
     id: string;
     name: string;
@@ -25,9 +19,7 @@ export interface Studio {
     seatsPerRow: number;
 }
 
-/**
- * Interface Cinema (Bioskop)
- */
+// Interface Cinema (Bioskop)
 export interface Cinema {
     id: string;
     name: string;
@@ -37,9 +29,7 @@ export interface Cinema {
     studios: Studio[];
 }
 
-/**
- * Implementasi konkret Studio
- */
+// Implementasi konkret Studio
 export class StudioImpl implements Studio {
     constructor(
         public id: string,
@@ -50,17 +40,13 @@ export class StudioImpl implements Studio {
         public seatsPerRow: number
     ) { }
 
-    /**
-     * Mendapatkan deskripsi studio
-     */
+    // Mendapatkan deskripsi studio
     getDescription(): string {
         return `${this.name} (${this.type}) - Kapasitas: ${this.capacity} kursi`;
     }
 }
 
-/**
- * Implementasi konkret Cinema
- */
+// Implementasi konkret Cinema
 export class CinemaImpl implements Cinema {
     constructor(
         public id: string,
@@ -71,16 +57,12 @@ export class CinemaImpl implements Cinema {
         public studios: Studio[] = []
     ) { }
 
-    /**
-     * Menambahkan studio ke bioskop
-     */
+    // Menambahkan studio ke bioskop
     addStudio(studio: Studio): void {
         this.studios.push(studio);
     }
 
-    /**
-     * Mendapatkan studio berdasarkan tipe
-     */
+    // Mendapatkan studio berdasarkan tipe
     getStudiosByType(type: StudioType): Studio[] {
         return this.studios.filter(studio => studio.type === type);
     }

@@ -1,45 +1,17 @@
-/**
- * =============================================================================
- * FACTORY METHOD PATTERN - Sistem Pembuatan Tiket Bioskop
- * =============================================================================
- * 
- * PENJELASAN MASALAH:
- * Dalam sistem pemesanan tiket bioskop, terdapat berbagai jenis tiket dengan
- * karakteristik berbeda (Regular, VIP, IMAX). Setiap jenis tiket memiliki
- * harga, fasilitas, dan tipe kursi yang berbeda. Tanpa design pattern,
- * kode pembuatan tiket akan berisi banyak conditional statement yang
- * sulit di-maintain dan tidak mengikuti Open/Closed Principle.
- * 
- * ALASAN PEMILIHAN:
- * Factory Method dipilih karena memungkinkan pembuatan objek tiket tanpa
- * mengekspos logika pembuatan ke client. Setiap jenis tiket dibuat oleh
- * factory spesifiknya, sehingga mudah menambahkan jenis tiket baru
- * tanpa mengubah kode existing.
- * 
- * PEMETAAN KE DOMAIN BIOSKOP:
- * - Product Interface: Ticket
- * - Concrete Products: RegularTicket, VIPTicket, IMAXTicket
- * - Creator: TicketFactory (abstract)
- * - Concrete Creators: RegularTicketFactory, VIPTicketFactory, IMAXTicketFactory
- * =============================================================================
- */
+
 
 import { Showtime } from '../models/Showtime';
 import { Seat, SeatType } from '../models/Seat';
 
-/**
- * Tipe tiket yang tersedia di bioskop
- */
+// Tipe tiket yang tersedia di bioskop
 export enum TicketType {
     REGULAR = 'REGULAR',
     VIP = 'VIP',
     IMAX = 'IMAX'
 }
 
-/**
- * Interface Ticket (Product)
- * Mendefinisikan kontrak untuk semua jenis tiket
- */
+// Interface Ticket (Product)
+// Mendefinisikan kontrak untuk semua jenis tiket
 export interface Ticket {
     id: string;
     type: TicketType;
@@ -53,10 +25,8 @@ export interface Ticket {
     printTicket(): string;
 }
 
-/**
- * Base class untuk semua tiket
- * Menyediakan implementasi umum yang dapat di-override oleh subclass
- */
+// Base class untuk semua tiket
+// Menyediakan implementasi umum yang dapat di-override oleh subclass
 abstract class BaseTicket implements Ticket {
     constructor(
         public id: string,
@@ -70,9 +40,7 @@ abstract class BaseTicket implements Ticket {
     abstract getDescription(): string;
     abstract getSeatType(): SeatType;
 
-    /**
-     * Mencetak informasi tiket dalam format standar
-     */
+    // Mencetak informasi tiket dalam format standar
     printTicket(): string {
         return `
 ╔══════════════════════════════════════════════════════════════╗
@@ -92,10 +60,8 @@ abstract class BaseTicket implements Ticket {
     }
 }
 
-/**
- * Concrete Product: RegularTicket
- * Tiket biasa dengan harga standar
- */
+// Concrete Product: RegularTicket
+// Tiket biasa dengan harga standar
 export class RegularTicket extends BaseTicket {
     constructor(id: string, showtime: Showtime, seat: Seat) {
         super(id, TicketType.REGULAR, showtime, seat, showtime.basePrice);
@@ -114,10 +80,8 @@ export class RegularTicket extends BaseTicket {
     }
 }
 
-/**
- * Concrete Product: VIPTicket
- * Tiket VIP dengan harga premium dan kursi khusus
- */
+// Concrete Product: VIPTicket
+// Tiket VIP dengan harga premium dan kursi khusus
 export class VIPTicket extends BaseTicket {
     private readonly VIP_MULTIPLIER = 1.5;
 
@@ -138,10 +102,8 @@ export class VIPTicket extends BaseTicket {
     }
 }
 
-/**
- * Concrete Product: IMAXTicket
- * Tiket IMAX dengan pengalaman premium dan harga tertinggi
- */
+// Concrete Product: IMAXTicket
+// Tiket IMAX dengan pengalaman premium dan harga tertinggi
 export class IMAXTicket extends BaseTicket {
     private readonly IMAX_MULTIPLIER = 2.0;
 
@@ -162,23 +124,14 @@ export class IMAXTicket extends BaseTicket {
     }
 }
 
-/**
- * Abstract Factory: TicketFactory (Creator)
- * Mendefinisikan interface untuk pembuatan tiket
- * Subclass akan menentukan jenis tiket yang dibuat
- */
+// Abstract Factory: TicketFactory (Creator)
+// Mendefinisikan interface untuk pembuatan tiket, subclass akan menentukan jenis tiket yang dibuat
 export abstract class TicketFactory {
-    /**
-     * Factory Method - Method yang akan di-override oleh subclass
-     * untuk membuat jenis tiket spesifik
-     */
+    // Factory Method - Method yang akan di-override oleh subclass untuk membuat jenis tiket spesifik
     abstract createTicket(showtime: Showtime, seat: Seat): Ticket;
 
-    /**
-     * Template method yang menggunakan factory method
-     * Mendemonstrasikan bahwa factory method dapat digunakan
-     * dalam konteks operasi lain
-     */
+    // Template method yang menggunakan factory method
+    // Mendemonstrasikan bahwa factory method dapat digunakan dalam konteks operasi lain
     orderTicket(showtime: Showtime, seat: Seat): Ticket {
         // Membuat tiket menggunakan factory method
         const ticket = this.createTicket(showtime, seat);
@@ -191,9 +144,7 @@ export abstract class TicketFactory {
         return ticket;
     }
 
-    /**
-     * Generate unique ticket ID
-     */
+    // Generate unique ticket ID
     protected generateTicketId(): string {
         const timestamp = Date.now().toString(36);
         const random = Math.random().toString(36).substring(2, 8);
@@ -201,10 +152,7 @@ export abstract class TicketFactory {
     }
 }
 
-/**
- * Concrete Creator: RegularTicketFactory
- * Factory untuk membuat tiket regular
- */
+// Concrete Creator: RegularTicketFactory - Factory untuk membuat tiket regular
 export class RegularTicketFactory extends TicketFactory {
     createTicket(showtime: Showtime, seat: Seat): Ticket {
         const id = this.generateTicketId();
@@ -212,10 +160,7 @@ export class RegularTicketFactory extends TicketFactory {
     }
 }
 
-/**
- * Concrete Creator: VIPTicketFactory
- * Factory untuk membuat tiket VIP
- */
+// Concrete Creator: VIPTicketFactory - Factory untuk membuat tiket VIP
 export class VIPTicketFactory extends TicketFactory {
     createTicket(showtime: Showtime, seat: Seat): Ticket {
         const id = this.generateTicketId();
@@ -223,10 +168,7 @@ export class VIPTicketFactory extends TicketFactory {
     }
 }
 
-/**
- * Concrete Creator: IMAXTicketFactory
- * Factory untuk membuat tiket IMAX
- */
+// Concrete Creator: IMAXTicketFactory - Factory untuk membuat tiket IMAX
 export class IMAXTicketFactory extends TicketFactory {
     createTicket(showtime: Showtime, seat: Seat): Ticket {
         const id = this.generateTicketId();
@@ -234,10 +176,8 @@ export class IMAXTicketFactory extends TicketFactory {
     }
 }
 
-/**
- * Simple Factory untuk kemudahan penggunaan
- * Memetakan tipe tiket ke factory yang sesuai
- */
+// Simple Factory untuk kemudahan penggunaan
+// Memetakan tipe tiket ke factory yang sesuai
 export class TicketFactoryProvider {
     private static factories: Map<TicketType, TicketFactory> = new Map([
         [TicketType.REGULAR, new RegularTicketFactory()],
@@ -245,9 +185,7 @@ export class TicketFactoryProvider {
         [TicketType.IMAX, new IMAXTicketFactory()]
     ]);
 
-    /**
-     * Mendapatkan factory berdasarkan tipe tiket
-     */
+    // Mendapatkan factory berdasarkan tipe tiket
     static getFactory(type: TicketType): TicketFactory {
         const factory = this.factories.get(type);
         if (!factory) {

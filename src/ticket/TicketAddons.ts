@@ -1,45 +1,11 @@
-/**
- * =============================================================================
- * DECORATOR PATTERN - Sistem Add-on Tiket Bioskop
- * =============================================================================
- * 
- * PENJELASAN MASALAH:
- * Tiket bioskop dapat memiliki berbagai tambahan (add-ons) seperti snack combo,
- * asuransi tiket, voucher parkir, dan lainnya. Setiap kombinasi add-on 
- * menghasilkan tiket dengan karakteristik dan harga berbeda. Jika menggunakan
- * inheritance, akan terjadi "class explosion" (mis: TicketWithSnack, 
- * TicketWithSnackAndInsurance, dll).
- * 
- * ALASAN PEMILIHAN:
- * Decorator Pattern dipilih karena memungkinkan penambahan fitur/tanggung jawab
- * ke objek secara dinamis tanpa mengubah struktur class. Add-on dapat
- * ditambahkan atau dihapus secara fleksibel saat runtime dengan cara
- * membungkus (wrapping) objek tiket dasar.
- * 
- * PEMETAAN KE DOMAIN BIOSKOP:
- * - Component Interface: TicketComponent
- * - Concrete Component: BasicTicket
- * - Decorator: TicketDecorator (abstract)
- * - Concrete Decorators: SnackComboDecorator, InsuranceDecorator, 
- *                        ParkingDecorator, SouvenirDecorator
- * =============================================================================
- */
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * COMPONENT INTERFACE
- * ═══════════════════════════════════════════════════════════════
- * Interface dasar untuk tiket yang dapat di-decorate
- */
 export interface TicketComponent {
     getDescription(): string;
     getPrice(): number;
     getDetails(): TicketDetails;
 }
 
-/**
- * Detail tiket untuk tampilan
- */
+// Detail tiket untuk tampilan
 export interface TicketDetails {
     baseDescription: string;
     addons: AddonDetail[];
@@ -53,12 +19,8 @@ export interface AddonDetail {
     description: string;
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONCRETE COMPONENT
- * ═══════════════════════════════════════════════════════════════
- * Tiket dasar tanpa dekorasi
- */
+// CONCRETE COMPONENT
+// Tiket dasar tanpa dekorasi
 export class BasicTicket implements TicketComponent {
     private movieTitle: string;
     private showtime: string;
@@ -95,13 +57,8 @@ export class BasicTicket implements TicketComponent {
     }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * ABSTRACT DECORATOR
- * ═══════════════════════════════════════════════════════════════
- * Base decorator yang mengimplementasikan interface component
- * dan menyimpan reference ke wrapped component
- */
+// ABSTRACT DECORATOR
+// Base decorator yang mengimplementasikan interface component dan menyimpan reference ke wrapped component
 export abstract class TicketDecorator implements TicketComponent {
     protected wrappedTicket: TicketComponent;
 
@@ -109,9 +66,7 @@ export abstract class TicketDecorator implements TicketComponent {
         this.wrappedTicket = ticket;
     }
 
-    /**
-     * Delegasi ke wrapped component
-     */
+    // Delegasi ke wrapped component
     getDescription(): string {
         return this.wrappedTicket.getDescription();
     }
@@ -124,9 +79,7 @@ export abstract class TicketDecorator implements TicketComponent {
         return this.wrappedTicket.getDetails();
     }
 
-    /**
-     * Helper untuk menambahkan addon ke details
-     */
+    // Helper untuk menambahkan addon ke details
     protected addAddonToDetails(
         details: TicketDetails,
         addon: AddonDetail
@@ -139,12 +92,8 @@ export abstract class TicketDecorator implements TicketComponent {
     }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONCRETE DECORATOR 1: SnackComboDecorator
- * ═══════════════════════════════════════════════════════════════
- * Menambahkan paket snack (popcorn + minuman) ke tiket
- */
+// CONCRETE DECORATOR 1: SnackComboDecorator
+// Menambahkan paket snack (popcorn + minuman) ke tiket
 export enum SnackSize {
     REGULAR = 'REGULAR',
     MEDIUM = 'MEDIUM',
@@ -193,12 +142,8 @@ export class SnackComboDecorator extends TicketDecorator {
     }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONCRETE DECORATOR 2: InsuranceDecorator
- * ═══════════════════════════════════════════════════════════════
- * Menambahkan asuransi tiket (refund jika tidak jadi menonton)
- */
+// CONCRETE DECORATOR 2: InsuranceDecorator
+// Menambahkan asuransi tiket (refund jika tidak jadi menonton)
 export class InsuranceDecorator extends TicketDecorator {
     private static readonly INSURANCE_RATE = 0.05; // 5% dari harga tiket
     private static readonly MIN_INSURANCE = 5000;
@@ -234,12 +179,8 @@ export class InsuranceDecorator extends TicketDecorator {
     }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONCRETE DECORATOR 3: ParkingDecorator
- * ═══════════════════════════════════════════════════════════════
- * Menambahkan voucher parkir gratis
- */
+// CONCRETE DECORATOR 3: ParkingDecorator
+// Menambahkan voucher parkir gratis
 export enum ParkingType {
     CAR = 'CAR',
     MOTORCYCLE = 'MOTORCYCLE'
@@ -283,12 +224,8 @@ export class ParkingDecorator extends TicketDecorator {
     }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONCRETE DECORATOR 4: SouvenirDecorator
- * ═══════════════════════════════════════════════════════════════
- * Menambahkan merchandise/souvenir film
- */
+// CONCRETE DECORATOR 4: SouvenirDecorator
+// Menambahkan merchandise/souvenir film
 export enum SouvenirType {
     KEYCHAIN = 'KEYCHAIN',
     POSTER = 'POSTER',
@@ -348,12 +285,8 @@ export class SouvenirDecorator extends TicketDecorator {
     }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONCRETE DECORATOR 5: PremiumSeatDecorator
- * ═══════════════════════════════════════════════════════════════
- * Upgrade kursi ke premium (recliner, blanket, etc)
- */
+// CONCRETE DECORATOR 5: PremiumSeatDecorator
+// Upgrade kursi ke premium (recliner, blanket, etc)
 export class PremiumSeatDecorator extends TicketDecorator {
     private static readonly UPGRADE_FEE = 50000;
 
@@ -379,12 +312,8 @@ export class PremiumSeatDecorator extends TicketDecorator {
     }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * HELPER: Ticket Display
- * ═══════════════════════════════════════════════════════════════
- * Class untuk menampilkan tiket yang sudah di-decorate
- */
+// HELPER: Ticket Display
+// Class untuk menampilkan tiket yang sudah di-decorate
 export class TicketDisplay {
     static print(ticket: TicketComponent): string {
         const details = ticket.getDetails();
@@ -419,12 +348,8 @@ export class TicketDisplay {
     }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * BUILDER HELPER: TicketWithAddonsBuilder
- * ═══════════════════════════════════════════════════════════════
- * Fluent builder untuk memudahkan pembuatan tiket dengan add-ons
- */
+// BUILDER HELPER: TicketWithAddonsBuilder
+// Fluent builder untuk memudahkan pembuatan tiket dengan add-ons
 export class TicketWithAddonsBuilder {
     private ticket: TicketComponent;
 

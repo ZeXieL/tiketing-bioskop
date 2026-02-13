@@ -1,8 +1,8 @@
-# 🎬 Sistem Pemesanan Tiket Bioskop Online
+# Sistem Pemesanan Tiket Bioskop Online
 
 Implementasi **12 GoF Design Patterns** dalam sistem pemesanan tiket bioskop online menggunakan TypeScript dengan pendekatan Object-Oriented Programming (OOP).
 
-## 📋 Deskripsi Proyek
+## Deskripsi Proyek
 
 Proyek ini merupakan implementasi sistem booking tiket bioskop yang mendemonstrasikan penggunaan **12 Design Patterns** dari Gang of Four (GoF):
 
@@ -25,60 +25,38 @@ Proyek ini merupakan implementasi sistem booking tiket bioskop yang mendemonstra
 ### Behavioral Patterns (4 patterns)
 | Pattern | Implementasi | File |
 |---------|--------------|------|
-| **State** | Lifecycle status booking (Draft→Pending→Paid→Confirmed→Completed) | `src/booking/BookingStatus.ts` |
+| **State** | Lifecycle status booking (Draft->Pending->Paid->Confirmed->Completed) | `src/booking/BookingStatus.ts` |
 | **Observer** | Notification system (Email, SMS, Push) | `src/notification/NotificationService.ts` |
 | **Strategy** | Metode pembayaran (Credit Card, E-Wallet, QRIS) | `src/payment/PaymentMethod.ts` |
 | **Command** | Seat selection dengan undo/redo | `src/seat/SeatSelection.ts` |
 
-## 🏗️ Struktur Proyek
+## Struktur Proyek
 
 ```
-📦 Tugas Besar/
-├── 📂 src/
-│   ├── 📂 models/           # Domain models
-│   │   ├── Movie.ts
-│   │   ├── Cinema.ts
-│   │   ├── Seat.ts
-│   │   ├── User.ts
-│   │   ├── Showtime.ts
-│   │   └── index.ts
-│   │
-│   ├── 📂 ticket/           # Factory Method & Decorator
-│   │   ├── TicketFactory.ts
-│   │   └── TicketAddons.ts
-│   │
-│   ├── 📂 cinema-package/   # Abstract Factory
-│   │   └── PackageFactory.ts
-│   │
-│   ├── 📂 booking/          # Builder & State
-│   │   ├── BookingBuilder.ts
-│   │   └── BookingStatus.ts
-│   │
-│   ├── 📂 seat/             # Prototype, Proxy & Command
-│   │   ├── SeatLayout.ts
-│   │   ├── SeatAvailability.ts
-│   │   └── SeatSelection.ts
-│   │
-│   ├── 📂 payment/          # Adapter & Strategy
-│   │   ├── PaymentGateway.ts
-│   │   └── PaymentMethod.ts
-│   │
-│   ├── 📂 notification/     # Observer
-│   │   └── NotificationService.ts
-│   │
-│   ├── 📂 services/         # Facade
-│   │   └── CinemaBookingService.ts
-│   │
-│   └── demo.ts              # Demo all patterns
+Tugas Besar/
+├── src/
+│   ├── models/           # Domain models
+│   ├── ticket/           # Factory Method & Decorator
+│   ├── cinema-package/   # Abstract Factory
+│   ├── booking/          # Builder & State
+│   ├── seat/             # Prototype, Proxy & Command
+│   ├── payment/          # Adapter & Strategy
+│   ├── notification/     # Observer
+│   ├── services/         # Facade
+│   └── demo.ts           # Demo all patterns
 │
-├── 📂 docs/                 # Dokumentasi
-├── 📂 diagrams/             # UML Diagrams
+├── tests/                # Unit Tests
+│   ├── creational/       # Tests for Creational Patterns
+│   ├── structural/       # Tests for Structural Patterns
+│   └── behavioral/       # Tests for Behavioral Patterns
+│
 ├── package.json
 ├── tsconfig.json
+├── jest.config.js
 └── README.md
 ```
 
-## 🚀 Cara Menjalankan
+## Cara Menjalankan
 
 ### Prerequisites
 - Node.js (v14 atau lebih tinggi)
@@ -100,6 +78,13 @@ npm run demo
 npx ts-node src/demo.ts
 ```
 
+### Menjalankan Test
+
+```bash
+# Menjalankan semua test
+npm test tests
+```
+
 ### Build
 
 ```bash
@@ -109,7 +94,7 @@ npm run build
 # Hasil ada di folder dist/
 ```
 
-## 📖 Contoh Penggunaan
+## Contoh Penggunaan
 
 ### Factory Method - Pembuatan Tiket
 ```typescript
@@ -151,7 +136,7 @@ controller.undo(); // Batalkan A2
 controller.redo(); // Pilih kembali A2
 ```
 
-## 📊 Diagram
+## Diagram
 
 Setiap pattern dilengkapi dengan:
 - Class Diagram
@@ -159,29 +144,30 @@ Setiap pattern dilengkapi dengan:
 
 Lihat folder `diagrams/` untuk UML diagrams.
 
-## 📝 Catatan Akademik
+## Catatan Akademik
 
 Setiap implementasi pattern mencakup:
 1. **Penjelasan Masalah** - Mengapa pattern diperlukan
 2. **Alasan Pemilihan** - Mengapa pattern ini sesuai
 3. **Pemetaan ke Domain** - Bagaimana pattern diterapkan ke konteks bioskop
 4. **Kelebihan** - Manfaat dari penggunaan pattern
-5. **Kode yang Terdokumentasi** - Dengan komentar JSDoc
+5. **Kode yang Terdokumentasi** - Dengan komentar
 
-## 🛠️ Teknologi
+## Teknologi
 
 - **TypeScript** - Static typing & OOP support
 - **Node.js** - Runtime environment
 - **ts-node** - TypeScript execution
+- **Jest** - Testing framework
 
-## 👥 Kontributor
+## Kontributor
 
 - [Nama Anda]
 
-## 📄 Lisensi
+## Lisensi
 
 Proyek ini dibuat untuk keperluan tugas besar mata kuliah.
 
 ---
 
-*Dibuat dengan ❤️ untuk pembelajaran Design Patterns*
+*Dibuat dengan cinta untuk pembelajaran Design Patterns*

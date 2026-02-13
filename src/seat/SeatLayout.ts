@@ -1,42 +1,28 @@
-/**
- * =============================================================================
- * PROTOTYPE PATTERN - Sistem Template Layout Kursi
- * =============================================================================
- * 
- * PENJELASAN MASALAH:
- * Bioskop memiliki banyak studio dengan konfigurasi kursi yang mirip atau sama.
- * Membuat layout kursi dari awal untuk setiap studio memerlukan proses yang
- * mahal (alokasi memori, inisialisasi). Beberapa studio mungkin memiliki
- * layout serupa dengan sedikit modifikasi (misalnya studio Regular vs VIP).
- * 
- * ALASAN PEMILIHAN:
- * Prototype Pattern dipilih karena memungkinkan pembuatan objek baru dengan
- * meng-clone objek yang sudah ada (prototype). Pattern ini menghemat resource
- * karena tidak perlu membuat objek dari awal dan memungkinkan kustomisasi
- * setelah cloning.
- * 
- * PEMETAAN KE DOMAIN BIOSKOP:
- * - Prototype Interface: Clonable
- * - Concrete Prototypes: SeatLayout, PromoTemplate
- * - Client: SeatLayoutRegistry
- * =============================================================================
- */
+// PROTOTYPE PATTERN - Sistem Template Layout Kursi
+//
+// PENJELASAN MASALAH:
+// Bioskop memiliki banyak studio dengan konfigurasi kursi yang mirip atau sama.
+// Membuat layout kursi dari awal untuk setiap studio memerlukan proses yang mahal.
+//
+// SOLUSI:
+// Prototype Pattern memungkinkan pembuatan objek baru dengan meng-clone objek yang sudah ada.
+//
+// PEMETAAN KE DOMAIN BIOSKOP:
+// - Prototype Interface: Clonable
+// - Concrete Prototypes: SeatLayout, PromoTemplate
+// - Client: SeatLayoutRegistry
 
 import { Seat, SeatImpl, SeatType, SeatStatus } from '../models/Seat';
 import { StudioType } from '../models/Cinema';
 
-/**
- * Interface Prototype
- * Mendefinisikan method clone yang harus diimplementasikan
- */
+// Interface Prototype
+// Mendefinisikan method clone yang harus diimplementasikan
 export interface Clonable<T> {
     clone(): T;
 }
 
-/**
- * Concrete Prototype: SeatLayout
- * Merepresentasikan layout kursi dalam sebuah studio yang dapat di-clone
- */
+// Concrete Prototype: SeatLayout
+// Merepresentasikan layout kursi dalam sebuah studio yang dapat di-clone
 export class SeatLayout implements Clonable<SeatLayout> {
     private id: string;
     private name: string;
@@ -63,9 +49,7 @@ export class SeatLayout implements Clonable<SeatLayout> {
         this.seats = this.initializeSeats();
     }
 
-    /**
-     * Inisialisasi kursi-kursi dalam layout
-     */
+    // Inisialisasi kursi-kursi dalam layout
     private initializeSeats(): Seat[][] {
         const seatMatrix: Seat[][] = [];
         const rowLabels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -92,9 +76,7 @@ export class SeatLayout implements Clonable<SeatLayout> {
         return seatMatrix;
     }
 
-    /**
-     * Menentukan tipe kursi berdasarkan posisi
-     */
+    // Menentukan tipe kursi berdasarkan posisi
     private determineSeatType(row: number, seatNumber: number): SeatType {
         // Baris belakang (2 baris terakhir) untuk VIP jika studio Regular
         if (this.studioType === StudioType.REGULAR && row >= this.rows - 2) {
@@ -116,9 +98,7 @@ export class SeatLayout implements Clonable<SeatLayout> {
         return SeatType.REGULAR;
     }
 
-    /**
-     * Menghitung harga kursi berdasarkan tipe
-     */
+    // Menghitung harga kursi berdasarkan tipe
     private calculateSeatPrice(seatType: SeatType): number {
         switch (seatType) {
             case SeatType.VIP:
@@ -132,10 +112,8 @@ export class SeatLayout implements Clonable<SeatLayout> {
         }
     }
 
-    /**
-     * Implementasi Clone Method (Deep Copy)
-     * Membuat salinan independen dari layout ini
-     */
+    // Implementasi Clone Method (Deep Copy)
+    // Membuat salinan independen dari layout ini
     clone(): SeatLayout {
         // Membuat instance baru
         const clonedLayout = new SeatLayout(
@@ -162,9 +140,7 @@ export class SeatLayout implements Clonable<SeatLayout> {
         return clonedLayout;
     }
 
-    /**
-     * Generate ID baru untuk clone
-     */
+    // Generate ID baru untuk clone
     private generateNewId(): string {
         const timestamp = Date.now().toString(36);
         return `LAYOUT-${timestamp}`;
@@ -179,9 +155,7 @@ export class SeatLayout implements Clonable<SeatLayout> {
     getBasePrice(): number { return this.basePrice; }
     getSeats(): Seat[][] { return this.seats; }
 
-    /**
-     * Mendapatkan kursi berdasarkan kode (contoh: A1, B5)
-     */
+    // Mendapatkan kursi berdasarkan kode (contoh: A1, B5)
     getSeat(code: string): Seat | null {
         const rowLabel = code.charAt(0).toUpperCase();
         const seatNumber = parseInt(code.substring(1));
@@ -194,23 +168,17 @@ export class SeatLayout implements Clonable<SeatLayout> {
         return null;
     }
 
-    /**
-     * Mendapatkan kursi yang tersedia
-     */
+    // Mendapatkan kursi yang tersedia
     getAvailableSeats(): Seat[] {
         return this.seats.flat().filter(seat => seat.status === SeatStatus.AVAILABLE);
     }
 
-    /**
-     * Menghitung total kapasitas
-     */
+    // Menghitung total kapasitas
     getTotalCapacity(): number {
         return this.rows * this.seatsPerRow;
     }
 
-    /**
-     * Menampilkan layout dalam format visual
-     */
+    // Menampilkan layout dalam format visual
     displayLayout(): string {
         let output = `
 ╔══════════════════════════════════════════════════════════════╗
@@ -260,16 +228,12 @@ export class SeatLayout implements Clonable<SeatLayout> {
         return output;
     }
 
-    /**
-     * Mengubah nama layout
-     */
+    // Mengubah nama layout
     setName(name: string): void {
         this.name = name;
     }
 
-    /**
-     * Mengubah harga dasar
-     */
+    // Mengubah harga dasar
     setBasePrice(price: number): void {
         this.basePrice = price;
         // Update semua harga kursi
@@ -281,10 +245,8 @@ export class SeatLayout implements Clonable<SeatLayout> {
     }
 }
 
-/**
- * Concrete Prototype: PromoTemplate
- * Template promo yang dapat di-clone untuk berbagai film
- */
+// Concrete Prototype: PromoTemplate
+// Template promo yang dapat di-clone untuk berbagai film
 export class PromoTemplate implements Clonable<PromoTemplate> {
     private id: string;
     private name: string;
@@ -317,9 +279,7 @@ export class PromoTemplate implements Clonable<PromoTemplate> {
         this.termsAndConditions = [];
     }
 
-    /**
-     * Clone promo template
-     */
+    // Clone promo template
     clone(): PromoTemplate {
         const cloned = new PromoTemplate(
             this.generateNewId(),
@@ -351,9 +311,7 @@ export class PromoTemplate implements Clonable<PromoTemplate> {
     getDescription(): string { return this.description; }
     getDiscountPercentage(): number { return this.discountPercentage; }
 
-    /**
-     * Menghitung diskon berdasarkan jumlah pembelian
-     */
+    // Menghitung diskon berdasarkan jumlah pembelian
     calculateDiscount(purchaseAmount: number): number {
         if (purchaseAmount < this.minimumPurchase) {
             return 0;
@@ -362,30 +320,22 @@ export class PromoTemplate implements Clonable<PromoTemplate> {
         return Math.min(discount, this.maxDiscount);
     }
 
-    /**
-     * Menambahkan syarat dan ketentuan
-     */
+    // Menambahkan syarat dan ketentuan
     addTermsAndCondition(term: string): void {
         this.termsAndConditions.push(term);
     }
 
-    /**
-     * Mengubah nama promo
-     */
+    // Mengubah nama promo
     setName(name: string): void {
         this.name = name;
     }
 
-    /**
-     * Mengubah deskripsi
-     */
+    // Mengubah deskripsi
     setDescription(description: string): void {
         this.description = description;
     }
 
-    /**
-     * Menampilkan detail promo
-     */
+    // Menampilkan detail promo
     displayPromo(): string {
         return `
 ╔══════════════════════════════════════════════════════════════╗
@@ -402,22 +352,16 @@ export class PromoTemplate implements Clonable<PromoTemplate> {
     }
 }
 
-/**
- * Registry untuk menyimpan prototype yang sering digunakan
- */
+// Registry untuk menyimpan prototype yang sering digunakan
 export class SeatLayoutRegistry {
     private static prototypes: Map<string, SeatLayout> = new Map();
 
-    /**
-     * Mendaftarkan prototype
-     */
+    // Mendaftarkan prototype
     static register(key: string, prototype: SeatLayout): void {
         this.prototypes.set(key, prototype);
     }
 
-    /**
-     * Mendapatkan clone dari prototype
-     */
+    // Mendapatkan clone dari prototype
     static getClone(key: string): SeatLayout | null {
         const prototype = this.prototypes.get(key);
         if (prototype) {
@@ -426,16 +370,12 @@ export class SeatLayoutRegistry {
         return null;
     }
 
-    /**
-     * Menampilkan semua prototype yang terdaftar
-     */
+    // Menampilkan semua prototype yang terdaftar
     static listPrototypes(): string[] {
         return Array.from(this.prototypes.keys());
     }
 
-    /**
-     * Inisialisasi dengan prototype default
-     */
+    // Inisialisasi dengan prototype default
     static initializeDefaults(): void {
         // Regular Studio Layout (10 baris x 15 kursi)
         this.register('REGULAR_STANDARD', new SeatLayout(
@@ -479,9 +419,7 @@ export class SeatLayoutRegistry {
     }
 }
 
-/**
- * Registry untuk promo templates
- */
+// Registry untuk promo templates
 export class PromoRegistry {
     private static prototypes: Map<string, PromoTemplate> = new Map();
 

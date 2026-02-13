@@ -1,92 +1,37 @@
-/**
- * =============================================================================
- * STATE PATTERN - Sistem Status Booking Bioskop
- * =============================================================================
- * 
- * PENJELASAN MASALAH:
- * Booking tiket bioskop memiliki berbagai status (Draft, Pending, Confirmed,
- * Paid, Completed, Cancelled) dengan behavior berbeda di setiap status.
- * Misalnya, booking hanya bisa dibayar jika statusnya Pending, dan hanya
- * bisa di-cancel jika belum Completed. Tanpa design pattern, kode akan
- * penuh dengan if-else untuk mengecek status sebelum setiap operasi.
- * 
- * ALASAN PEMILIHAN:
- * State Pattern dipilih karena memungkinkan objek mengubah behavior-nya
- * ketika internal state berubah. Setiap state dienkapsulasi dalam class
- * terpisah, sehingga transisi antar state menjadi jelas dan maintainable.
- * 
- * PEMETAAN KE DOMAIN BIOSKOP:
- * - Context: BookingContext
- * - State Interface: BookingState
- * - Concrete States: DraftState, PendingState, ConfirmedState, PaidState,
- *                    CompletedState, CancelledState
- * =============================================================================
- */
-
-/**
- * ═══════════════════════════════════════════════════════════════
- * STATE INTERFACE
- * ═══════════════════════════════════════════════════════════════
- * Interface yang mendefinisikan semua operasi yang dapat dilakukan
- * pada booking dan perilaku berbeda di setiap state
- */
 export interface BookingState {
-    /**
-     * Mendapatkan nama state
-     */
+    // Mendapatkan nama state
     getName(): string;
 
-    /**
-     * Menambahkan kursi ke booking
-     */
+    // Menambahkan kursi ke booking
     addSeat(context: BookingContext): void;
 
-    /**
-     * Melanjutkan ke proses pembayaran
-     */
+    // Melanjutkan ke proses pembayaran
     proceedToPayment(context: BookingContext): void;
 
-    /**
-     * Melakukan pembayaran
-     */
+    // Melakukan pembayaran
     pay(context: BookingContext, amount: number): void;
 
-    /**
-     * Mengkonfirmasi booking setelah pembayaran
-     */
+    // Mengkonfirmasi booking setelah pembayaran
     confirm(context: BookingContext): void;
 
-    /**
-     * Menyelesaikan booking (setelah film ditonton)
-     */
+    // Menyelesaikan booking (setelah film ditonton)
     complete(context: BookingContext): void;
 
-    /**
-     * Membatalkan booking
-     */
+    // Membatalkan booking
     cancel(context: BookingContext): void;
 
-    /**
-     * Meminta refund
-     */
+    // Meminta refund
     refund(context: BookingContext): void;
 
-    /**
-     * Mengecek apakah operasi tertentu diperbolehkan
-     */
+    // Mengecek apakah operasi tertentu diperbolehkan
     canModify(): boolean;
     canPay(): boolean;
     canCancel(): boolean;
     canRefund(): boolean;
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONTEXT
- * ═══════════════════════════════════════════════════════════════
- * Context menyimpan reference ke state saat ini dan mendelegasikan
- * operasi ke state tersebut
- */
+// CONTEXT
+// Context menyimpan reference ke state saat ini dan mendelegasikan operasi ke state tersebut
 export class BookingContext {
     private state: BookingState;
     private bookingId: string;
@@ -127,9 +72,7 @@ export class BookingContext {
         return `BKG-${timestamp}-${random}`.toUpperCase();
     }
 
-    /**
-     * Mengubah state booking
-     */
+    // Mengubah state booking
     setState(state: BookingState): void {
         const previousState = this.state.getName();
         this.state = state;
@@ -204,17 +147,15 @@ export class BookingContext {
         this.updatedAt = new Date();
     }
 
-    /**
-     * Menampilkan detail booking
-     */
+    // Menampilkan detail booking
     displayDetails(): string {
         const stateIndicators: Record<string, string> = {
-            'Draft': '📝',
-            'Pending': '⏳',
-            'Confirmed': '✅',
-            'Paid': '💰',
-            'Completed': '🎬',
-            'Cancelled': '❌'
+            'Draft': '-',
+            'Pending': '-',
+            'Confirmed': 'OK',
+            'Paid': '$',
+            'Completed': 'X',
+            'Cancelled': '!'
         };
 
         const indicator = stateIndicators[this.state.getName()] || '•';
@@ -236,9 +177,7 @@ export class BookingContext {
     `.trim();
     }
 
-    /**
-     * Menampilkan history state
-     */
+    // Menampilkan history state
     displayStateHistory(): string {
         let output = '\n═══ STATE HISTORY ═══\n';
         for (const entry of this.stateHistory) {
@@ -255,12 +194,8 @@ interface StateHistoryEntry {
     timestamp: Date;
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONCRETE STATE: DraftState
- * ═══════════════════════════════════════════════════════════════
- * State awal ketika booking baru dibuat
- */
+// CONCRETE STATE: DraftState
+// State awal ketika booking baru dibuat
 export class DraftState implements BookingState {
     getName(): string { return 'Draft'; }
 
@@ -305,12 +240,8 @@ export class DraftState implements BookingState {
     canRefund(): boolean { return false; }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONCRETE STATE: PendingState
- * ═══════════════════════════════════════════════════════════════
- * Booking menunggu pembayaran
- */
+// CONCRETE STATE: PendingState
+// Booking menunggu pembayaran
 export class PendingState implements BookingState {
     getName(): string { return 'Pending'; }
 
@@ -359,12 +290,8 @@ export class PendingState implements BookingState {
     canRefund(): boolean { return false; }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONCRETE STATE: PaidState
- * ═══════════════════════════════════════════════════════════════
- * Pembayaran sudah diterima
- */
+// CONCRETE STATE: PaidState
+// Pembayaran sudah diterima
 export class PaidState implements BookingState {
     getName(): string { return 'Paid'; }
 
@@ -406,12 +333,8 @@ export class PaidState implements BookingState {
     canRefund(): boolean { return true; }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONCRETE STATE: ConfirmedState
- * ═══════════════════════════════════════════════════════════════
- * Booking sudah dikonfirmasi, e-ticket terbit
- */
+// CONCRETE STATE: ConfirmedState
+// Booking sudah dikonfirmasi, e-ticket terbit
 export class ConfirmedState implements BookingState {
     getName(): string { return 'Confirmed'; }
 
@@ -453,12 +376,8 @@ export class ConfirmedState implements BookingState {
     canRefund(): boolean { return true; }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONCRETE STATE: CompletedState
- * ═══════════════════════════════════════════════════════════════
- * Booking selesai (customer sudah menonton)
- */
+// CONCRETE STATE: CompletedState
+// Booking selesai (customer sudah menonton)
 export class CompletedState implements BookingState {
     getName(): string { return 'Completed'; }
 
@@ -496,12 +415,8 @@ export class CompletedState implements BookingState {
     canRefund(): boolean { return false; }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONCRETE STATE: CancelledState
- * ═══════════════════════════════════════════════════════════════
- * Booking dibatalkan
- */
+// CONCRETE STATE: CancelledState
+// Booking dibatalkan
 export class CancelledState implements BookingState {
     getName(): string { return 'Cancelled'; }
 
@@ -539,33 +454,28 @@ export class CancelledState implements BookingState {
     canRefund(): boolean { return false; }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * STATE MACHINE DIAGRAM (untuk dokumentasi)
- * ═══════════════════════════════════════════════════════════════
- * 
- *  ┌─────────┐
- *  │  DRAFT  │ ───────────────────────────────────────┐
- *  └────┬────┘                                        │
- *       │ proceedToPayment()                          │ cancel()
- *       ▼                                             ▼
- *  ┌─────────┐                                   ┌───────────┐
- *  │ PENDING │ ──────────────────────────────────│ CANCELLED │
- *  └────┬────┘ cancel()                          └───────────┘
- *       │ pay()                                       ▲
- *       ▼                                             │
- *  ┌─────────┐                                        │
- *  │  PAID   │ ───────────────────────────────────────┤ refund()
- *  └────┬────┘                                        │
- *       │ confirm()                                   │
- *       ▼                                             │
- *  ┌───────────┐                                      │
- *  │ CONFIRMED │ ─────────────────────────────────────┘ refund()
- *  └─────┬─────┘
- *        │ complete()
- *        ▼
- *  ┌───────────┐
- *  │ COMPLETED │
- *  └───────────┘
- * 
- */
+// STATE MACHINE DIAGRAM (untuk dokumentasi)
+//
+//  ┌─────────┐
+//  │  DRAFT  │ ───────────────────────────────────────┐
+//  └────┬────┘                                        │
+//       │ proceedToPayment()                          │ cancel()
+//       ▼                                             ▼
+//  ┌─────────┐                                   ┌───────────┐
+//  │ PENDING │ ──────────────────────────────────│ CANCELLED │
+//  └────┬────┘ cancel()                          └───────────┘
+//       │ pay()                                       ▲
+//       ▼                                             │
+//  ┌─────────┐                                        │
+//  │  PAID   │ ───────────────────────────────────────┤ refund()
+//  └────┬────┘                                        │
+//       │ confirm()                                   │
+//       ▼                                             │
+//  ┌───────────┐                                      │
+//  │ CONFIRMED │ ─────────────────────────────────────┘ refund()
+//  └─────┬─────┘
+//        │ complete()
+//        ▼
+//  ┌───────────┐
+//  │ COMPLETED │
+//  └───────────┘

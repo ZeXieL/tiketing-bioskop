@@ -1,36 +1,20 @@
-/**
- * =============================================================================
- * ADAPTER PATTERN - Integrasi Payment Gateway
- * =============================================================================
- * 
- * PENJELASAN MASALAH:
- * Sistem bioskop perlu menerima pembayaran dari berbagai payment gateway
- * (GoPay, OVO, Bank Transfer) yang masing-masing memiliki interface berbeda.
- * Tanpa adapter, sistem harus memiliki kode spesifik untuk setiap gateway,
- * menyebabkan coupling tinggi dan sulit menambahkan gateway baru.
- * 
- * ALASAN PEMILIHAN:
- * Adapter Pattern dipilih untuk mengkonversi interface berbagai payment gateway
- * ke interface standar yang digunakan sistem. Pattern ini memungkinkan integrasi
- * gateway baru tanpa mengubah kode client dan menjaga loose coupling.
- * 
- * PEMETAAN KE DOMAIN BIOSKOP:
- * - Target Interface: PaymentProcessor
- * - Adaptees: GoPayAPI, OVOAPI, BankTransferAPI
- * - Adapters: GoPayAdapter, OVOAdapter, BankTransferAdapter
- * =============================================================================
- */
+// ADAPTER PATTERN - Integrasi Payment Gateway
+//
+// PENJELASAN MASALAH:
+// Sistem bioskop perlu menerima pembayaran dari berbagai payment gateway (GoPay, OVO, Bank Transfer).
+// Masing-masing gateway memiliki interface berbeda.
+//
+// SOLUSI:
+// Adapter Pattern mengkonversi interface berbagai payment gateway ke interface standar sistem.
+//
+// PEMETAAN KE DOMAIN BIOSKOP:
+// - Target Interface: PaymentProcessor
+// - Adaptees: GoPayAPI, OVOAPI, BankTransferAPI
+// - Adapters: GoPayAdapter, OVOAdapter, BankTransferAdapter
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * TARGET INTERFACE
- * ═══════════════════════════════════════════════════════════════
- * Interface standar yang diharapkan oleh sistem bioskop
- */
-
-/**
- * Status transaksi terpadu
- */
+// TARGET INTERFACE
+// Interface standar yang diharapkan oleh sistem bioskop
+// Status transaksi terpadu
 export enum TransactionStatus {
     PENDING = 'PENDING',
     SUCCESS = 'SUCCESS',
@@ -38,9 +22,7 @@ export enum TransactionStatus {
     CANCELLED = 'CANCELLED'
 }
 
-/**
- * Hasil transaksi terpadu
- */
+// Hasil transaksi terpadu
 export interface PaymentResponse {
     transactionId: string;
     status: TransactionStatus;
@@ -51,10 +33,8 @@ export interface PaymentResponse {
     gatewayRef?: string;
 }
 
-/**
- * Target Interface: PaymentProcessor
- * Interface yang digunakan oleh sistem bioskop
- */
+// Target Interface: PaymentProcessor
+// Interface yang digunakan oleh sistem bioskop
 export interface PaymentProcessor {
     getName(): string;
     processPayment(amount: number, orderId: string, customerInfo: CustomerInfo): PaymentResponse;
@@ -62,28 +42,20 @@ export interface PaymentProcessor {
     refund(transactionId: string): PaymentResponse;
 }
 
-/**
- * Info pelanggan untuk pembayaran
- */
+// Info pelanggan untuk pembayaran
 export interface CustomerInfo {
     name: string;
     email: string;
     phone: string;
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * ADAPTEE 1: GoPayAPI
- * ═══════════════════════════════════════════════════════════════
- * API GoPay dengan interface spesifik yang berbeda dari sistem
- */
+// ADAPTEE 1: GoPayAPI
+// API GoPay dengan interface spesifik yang berbeda dari sistem
 export class GoPayAPI {
-    /**
-     * Interface GoPay menggunakan format berbeda:
-     * - merchantOrderId bukan orderId
-     * - userPhone bukan customerInfo
-     * - Method createTransaction bukan processPayment
-     */
+    // Interface GoPay menggunakan format berbeda:
+    // - merchantOrderId bukan orderId
+    // - userPhone bukan customerInfo
+    // - Method createTransaction bukan processPayment
     createTransaction(
         merchantOrderId: string,
         totalAmount: number,
@@ -140,18 +112,12 @@ interface GoPayTransactionResult {
     callback_url?: string;
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * ADAPTEE 2: OVOAPI
- * ═══════════════════════════════════════════════════════════════
- * API OVO dengan interface yang berbeda lagi
- */
+// ADAPTEE 2: OVOAPI
+// API OVO dengan interface yang berbeda lagi
 export class OVOAPI {
-    /**
-     * OVO menggunakan format berbeda:
-     * - pushToPayRequest method
-     * - Menggunakan ovoId bukan phone
-     */
+    // OVO menggunakan format berbeda:
+    // - pushToPayRequest method
+    // - Menggunakan ovoId bukan phone
     pushToPayRequest(
         ovoId: string,
         amountInCents: number, // OVO uses cents!
@@ -212,16 +178,10 @@ interface OVOPaymentResult {
     timestamp: number;
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * ADAPTEE 3: BankTransferAPI
- * ═══════════════════════════════════════════════════════════════
- * API Bank Transfer dengan format yang berbeda
- */
+// ADAPTEE 3: BankTransferAPI
+// API Bank Transfer dengan format yang berbeda
 export class BankTransferAPI {
-    /**
-     * Bank Transfer menggunakan virtual account
-     */
+    // Bank Transfer menggunakan virtual account
     createVirtualAccount(
         bankCode: string,
         customerName: string,
@@ -295,12 +255,8 @@ interface BankTransferResult {
     paid_at?: string;
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * ADAPTER 1: GoPayAdapter
- * ═══════════════════════════════════════════════════════════════
- * Mengadaptasi GoPayAPI ke interface PaymentProcessor
- */
+// ADAPTER 1: GoPayAdapter
+// Mengadaptasi GoPayAPI ke interface PaymentProcessor
 export class GoPayAdapter implements PaymentProcessor {
     private gopayApi: GoPayAPI;
     private callbackUrl: string;
@@ -337,9 +293,7 @@ export class GoPayAdapter implements PaymentProcessor {
         return this.adaptResponse(result);
     }
 
-    /**
-     * Helper: Mengkonversi GoPayTransactionResult ke PaymentResponse
-     */
+    // Helper: Mengkonversi GoPayTransactionResult ke PaymentResponse
     private adaptResponse(result: GoPayTransactionResult): PaymentResponse {
         return {
             transactionId: result.transaction_id,
@@ -380,12 +334,8 @@ export class GoPayAdapter implements PaymentProcessor {
     }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * ADAPTER 2: OVOAdapter
- * ═══════════════════════════════════════════════════════════════
- * Mengadaptasi OVOAPI ke interface PaymentProcessor
- */
+// ADAPTER 2: OVOAdapter
+// Mengadaptasi OVOAPI ke interface PaymentProcessor
 export class OVOAdapter implements PaymentProcessor {
     private ovoApi: OVOAPI;
     private merchantCode: string;
@@ -457,12 +407,8 @@ export class OVOAdapter implements PaymentProcessor {
     }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * ADAPTER 3: BankTransferAdapter
- * ═══════════════════════════════════════════════════════════════
- * Mengadaptasi BankTransferAPI ke interface PaymentProcessor
- */
+// ADAPTER 3: BankTransferAdapter
+// Mengadaptasi BankTransferAPI ke interface PaymentProcessor
 export class BankTransferAdapter implements PaymentProcessor {
     private bankApi: BankTransferAPI;
     private bankCode: string;
@@ -537,12 +483,8 @@ export class BankTransferAdapter implements PaymentProcessor {
     }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * PAYMENT GATEWAY MANAGER
- * ═══════════════════════════════════════════════════════════════
- * Class untuk mengelola dan memilih payment gateway
- */
+// PAYMENT GATEWAY MANAGER
+// Class untuk mengelola dan memilih payment gateway
 export enum PaymentMethod {
     GOPAY = 'GOPAY',
     OVO = 'OVO',
@@ -565,9 +507,7 @@ export class PaymentGatewayManager {
         this.adapters.set(PaymentMethod.BANK_MANDIRI, new BankTransferAdapter('MANDIRI'));
     }
 
-    /**
-     * Mendapatkan processor berdasarkan metode pembayaran
-     */
+    // Mendapatkan processor berdasarkan metode pembayaran
     getProcessor(method: PaymentMethod): PaymentProcessor {
         const processor = this.adapters.get(method);
         if (!processor) {
@@ -576,16 +516,12 @@ export class PaymentGatewayManager {
         return processor;
     }
 
-    /**
-     * Mendapatkan daftar metode pembayaran yang tersedia
-     */
+    // Mendapatkan daftar metode pembayaran yang tersedia
     getAvailableMethods(): PaymentMethod[] {
         return Array.from(this.adapters.keys());
     }
 
-    /**
-     * Memproses pembayaran dengan metode tertentu
-     */
+    // Memproses pembayaran dengan metode tertentu
     processPayment(
         method: PaymentMethod,
         amount: number,

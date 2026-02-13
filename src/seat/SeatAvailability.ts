@@ -1,76 +1,48 @@
-/**
- * =============================================================================
- * PROXY PATTERN - Sistem Ketersediaan Kursi dengan Cache dan Kontrol Akses
- * =============================================================================
- * 
- * PENJELASAN MASALAH:
- * Pengecekan ketersediaan kursi bioskop adalah operasi yang sering dilakukan
- * dan membutuhkan akses ke database/server. Tanpa optimasi, setiap request
- * akan membebani server. Selain itu, diperlukan kontrol akses untuk mencegah
- * pengguna tidak terdaftar mengakses sistem.
- * 
- * ALASAN PEMILIHAN:
- * Proxy Pattern dipilih untuk:
- * 1. Virtual Proxy: Lazy loading data kursi
- * 2. Caching Proxy: Menyimpan hasil query ke cache
- * 3. Protection Proxy: Mengontrol akses berdasarkan role user
- * 4. Logging Proxy: Mencatat setiap akses untuk monitoring
- * 
- * PEMETAAN KE DOMAIN BIOSKOP:
- * - Subject Interface: SeatAvailabilityService
- * - Real Subject: RealSeatAvailabilityService
- * - Proxy: SeatAvailabilityProxy (dengan caching dan access control)
- * =============================================================================
- */
+// PROXY PATTERN - Sistem Ketersediaan Kursi dengan Cache dan Kontrol Akses
+//
+// PENJELASAN MASALAH:
+// Pengecekan ketersediaan kursi bioskop adalah operasi yang sering dilakukan dan mahal.
+// Selain itu, diperlukan kontrol akses untuk mencegah pengguna tidak terdaftar mengakses sistem.
+//
+// SOLUSI:
+// Proxy Pattern dipilih untuk:
+// 1. Virtual Proxy: Lazy loading data kursi
+// 2. Caching Proxy: Menyimpan hasil query ke cache
+// 3. Protection Proxy: Mengontrol akses berdasarkan role user
+// 4. Logging Proxy: Mencatat setiap akses untuk monitoring
+//
+// PEMETAAN KE DOMAIN BIOSKOP:
+// - Subject Interface: SeatAvailabilityService
+// - Real Subject: RealSeatAvailabilityService
+// - Proxy: SeatAvailabilityProxy
 
 import { Seat, SeatImpl, SeatType, SeatStatus } from '../models/Seat';
 import { User, MembershipType } from '../models/User';
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * SUBJECT INTERFACE
- * ═══════════════════════════════════════════════════════════════
- * Interface yang didefinisikan baik untuk real service maupun proxy
- */
+// SUBJECT INTERFACE
+// Interface yang didefinisikan baik untuk real service maupun proxy
 export interface SeatAvailabilityService {
-    /**
-     * Mendapatkan semua kursi untuk showtime tertentu
-     */
+    // Mendapatkan semua kursi untuk showtime tertentu
     getSeats(showtimeId: string): Seat[];
 
-    /**
-     * Mendapatkan kursi yang tersedia saja
-     */
+    // Mendapatkan kursi yang tersedia saja
     getAvailableSeats(showtimeId: string): Seat[];
 
-    /**
-     * Mengecek apakah kursi tertentu tersedia
-     */
+    // Mengecek apakah kursi tertentu tersedia
     isSeatAvailable(showtimeId: string, seatCode: string): boolean;
 
-    /**
-     * Memesan kursi (mengubah status menjadi SELECTED)
-     */
+    // Memesan kursi (mengubah status menjadi SELECTED)
     selectSeat(showtimeId: string, seatCode: string): boolean;
 
-    /**
-     * Membatalkan pemilihan kursi
-     */
+    // Membatalkan pemilihan kursi
     deselectSeat(showtimeId: string, seatCode: string): boolean;
 
-    /**
-     * Mengkonfirmasi booking (mengubah status menjadi BOOKED)
-     */
+    // Mengkonfirmasi booking (mengubah status menjadi BOOKED)
     confirmBooking(showtimeId: string, seatCodes: string[]): boolean;
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * REAL SUBJECT
- * ═══════════════════════════════════════════════════════════════
- * Implementasi aktual yang melakukan operasi sebenarnya
- * (simulasi akses ke database)
- */
+// REAL SUBJECT
+// Implementasi aktual yang melakukan operasi sebenarnya (simulasi akses ke database)
 export class RealSeatAvailabilityService implements SeatAvailabilityService {
     private seatData: Map<string, Seat[][]> = new Map();
     private readonly ARTIFICIAL_DELAY = 100; // Simulasi latency database
@@ -79,9 +51,7 @@ export class RealSeatAvailabilityService implements SeatAvailabilityService {
         console.log('[RealService] Service initialized');
     }
 
-    /**
-     * Simulasi delay akses database
-     */
+    // Simulasi delay akses database
     private simulateDatabaseAccess(): void {
         const start = Date.now();
         while (Date.now() - start < this.ARTIFICIAL_DELAY) {
@@ -89,9 +59,7 @@ export class RealSeatAvailabilityService implements SeatAvailabilityService {
         }
     }
 
-    /**
-     * Inisialisasi data kursi untuk showtime (lazy initialization)
-     */
+    // Inisialisasi data kursi untuk showtime (lazy initialization)
     private initializeShowtime(showtimeId: string): void {
         if (this.seatData.has(showtimeId)) return;
 
@@ -212,25 +180,17 @@ export class RealSeatAvailabilityService implements SeatAvailabilityService {
     }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * PROXY
- * ═══════════════════════════════════════════════════════════════
- * Proxy yang menambahkan caching, access control, dan logging
- */
+// PROXY
+// Proxy yang menambahkan caching, access control, dan logging
 
-/**
- * Cache entry dengan TTL
- */
+// Cache entry dengan TTL
 interface CacheEntry<T> {
     data: T;
     timestamp: number;
     ttl: number;
 }
 
-/**
- * Access level untuk proteksi
- */
+// Access level untuk proteksi
 export enum AccessLevel {
     GUEST = 0,
     MEMBER = 1,
@@ -253,9 +213,7 @@ export class SeatAvailabilityProxy implements SeatAvailabilityService {
         console.log('[Proxy] Proxy initialized');
     }
 
-    /**
-     * Set current user untuk access control
-     */
+    // Set current user untuk access control
     setCurrentUser(user: User | null): void {
         this.currentUser = user;
         this.accessLevel = this.determineAccessLevel(user);
@@ -276,9 +234,7 @@ export class SeatAvailabilityProxy implements SeatAvailabilityService {
         }
     }
 
-    /**
-     * Lazy initialization of real service
-     */
+    // Lazy initialization of real service
     private getRealService(): RealSeatAvailabilityService {
         if (!this.realService) {
             console.log('[Proxy] Lazy loading real service...');
@@ -287,9 +243,7 @@ export class SeatAvailabilityProxy implements SeatAvailabilityService {
         return this.realService;
     }
 
-    /**
-     * Check cache validity
-     */
+    // Check cache validity
     private isCacheValid(key: string): boolean {
         const entry = this.cache.get(key);
         if (!entry) return false;
@@ -302,9 +256,7 @@ export class SeatAvailabilityProxy implements SeatAvailabilityService {
         return isValid;
     }
 
-    /**
-     * Log access
-     */
+    // Log access
     private logAccess(method: string, showtimeId: string, details?: string): void {
         const entry: AccessLogEntry = {
             timestamp: new Date(),
@@ -324,9 +276,7 @@ export class SeatAvailabilityProxy implements SeatAvailabilityService {
         console.log(`[Proxy] LOG: ${method} - ${showtimeId} by ${entry.userId}`);
     }
 
-    /**
-     * Check access permission
-     */
+    // Check access permission
     private checkAccess(requiredLevel: AccessLevel, operation: string): void {
         if (this.accessLevel < requiredLevel) {
             const message = `Access denied: ${operation} requires ${AccessLevel[requiredLevel]} level`;
@@ -428,9 +378,7 @@ export class SeatAvailabilityProxy implements SeatAvailabilityService {
     // ADDITIONAL PROXY METHODS
     // ═══════════════════════════════════════════════════════════════
 
-    /**
-     * Invalidate cache untuk showtime tertentu
-     */
+    // Invalidate cache untuk showtime tertentu
     private invalidateCache(showtimeId: string): void {
         const keysToDelete: string[] = [];
         for (const key of this.cache.keys()) {
@@ -442,17 +390,13 @@ export class SeatAvailabilityProxy implements SeatAvailabilityService {
         console.log(`[Proxy] Cache invalidated for ${showtimeId}`);
     }
 
-    /**
-     * Clear all cache
-     */
+    // Clear all cache
     clearCache(): void {
         this.cache.clear();
         console.log('[Proxy] All cache cleared');
     }
 
-    /**
-     * Get cache statistics
-     */
+    // Get cache statistics
     getCacheStats(): CacheStats {
         return {
             entries: this.cache.size,
@@ -460,16 +404,12 @@ export class SeatAvailabilityProxy implements SeatAvailabilityService {
         };
     }
 
-    /**
-     * Get access log
-     */
+    // Get access log
     getAccessLog(limit: number = 50): AccessLogEntry[] {
         return this.accessLog.slice(-limit);
     }
 
-    /**
-     * VIP-only: Preview premium seats
-     */
+    // VIP-only: Preview premium seats
     getVIPSeats(showtimeId: string): Seat[] {
         this.checkAccess(AccessLevel.VIP, 'preview VIP seats');
         this.logAccess('getVIPSeats', showtimeId);
@@ -479,9 +419,7 @@ export class SeatAvailabilityProxy implements SeatAvailabilityService {
     }
 }
 
-/**
- * Interface untuk log entry
- */
+// Interface untuk log entry
 interface AccessLogEntry {
     timestamp: Date;
     userId: string;
@@ -490,19 +428,13 @@ interface AccessLogEntry {
     details?: string;
 }
 
-/**
- * Interface untuk cache statistics
- */
+// Interface untuk cache statistics
 interface CacheStats {
     entries: number;
     keys: string[];
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * SEAT DISPLAY HELPER
- * ═══════════════════════════════════════════════════════════════
- */
+// SEAT DISPLAY HELPER
 export class SeatDisplayHelper {
     static displayLayout(seats: Seat[], seatsPerRow: number): string {
         if (seats.length === 0) return 'No seats available';

@@ -1,39 +1,3 @@
-/**
- * =============================================================================
- * OBSERVER PATTERN - Sistem Notifikasi Booking Bioskop
- * =============================================================================
- * 
- * PENJELASAN MASALAH:
- * Ketika status booking berubah, berbagai pihak perlu dinotifikasi:
- * - Customer perlu menerima email/SMS konfirmasi
- * - Sistem inventory perlu mengupdate ketersediaan kursi
- * - Sistem analytics perlu mencatat transaksi
- * - Staff bioskop perlu mengetahui booking baru
- * 
- * Tanpa design pattern, setiap perubahan status harus memanggil semua
- * dependent secara manual, menyebabkan tight coupling.
- * 
- * ALASAN PEMILIHAN:
- * Observer Pattern dipilih untuk membangun hubungan one-to-many antara
- * booking (subject) dan berbagai notification channel (observers).
- * Ketika booking berubah, semua observer diberitahu secara otomatis
- * tanpa subject perlu mengetahui detail observer.
- * 
- * PEMETAAN KE DOMAIN BIOSKOP:
- * - Subject Interface: BookingSubject
- * - Concrete Subject: BookingNotifier
- * - Observer Interface: BookingObserver
- * - Concrete Observers: EmailNotification, SMSNotification, PushNotification,
- *                       InventoryObserver, AnalyticsObserver
- * =============================================================================
- */
-
-/**
- * ═══════════════════════════════════════════════════════════════
- * EVENT DATA
- * ═══════════════════════════════════════════════════════════════
- * Data yang dikirim ke observer ketika event terjadi
- */
 export interface BookingEvent {
     eventType: BookingEventType;
     bookingId: string;
@@ -61,58 +25,34 @@ export enum BookingEventType {
     REMINDER_24_HOUR = 'REMINDER_24_HOUR'
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * OBSERVER INTERFACE
- * ═══════════════════════════════════════════════════════════════
- * Interface untuk semua observer
- */
+// OBSERVER INTERFACE
+// Interface untuk semua observer
 export interface BookingObserver {
-    /**
-     * Nama unik observer
-     */
+    // Nama unik observer
     getName(): string;
 
-    /**
-     * Method yang dipanggil ketika ada event
-     */
+    // Method yang dipanggil ketika ada event
     update(event: BookingEvent): void;
 
-    /**
-     * Event types yang di-subscribe oleh observer ini
-     */
+    // Event types yang di-subscribe oleh observer ini
     getSubscribedEvents(): BookingEventType[];
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * SUBJECT INTERFACE
- * ═══════════════════════════════════════════════════════════════
- * Interface untuk subject yang observable
- */
+// SUBJECT INTERFACE
+// Interface untuk subject yang observable
 export interface BookingSubject {
-    /**
-     * Mendaftarkan observer
-     */
+    // Mendaftarkan observer
     attach(observer: BookingObserver): void;
 
-    /**
-     * Menghapus observer
-     */
+    // Menghapus observer
     detach(observer: BookingObserver): void;
 
-    /**
-     * Memberitahu semua observer
-     */
+    // Memberitahu semua observer
     notify(event: BookingEvent): void;
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONCRETE SUBJECT: BookingNotifier
- * ═══════════════════════════════════════════════════════════════
- * Mengelola daftar observer dan mengirim notifikasi
- */
+// CONCRETE SUBJECT: BookingNotifier
+// Mengelola daftar observer dan mengirim notifikasi
 export class BookingNotifier implements BookingSubject {
     private observers: Map<string, BookingObserver> = new Map();
     private eventLog: BookingEvent[] = [];
@@ -122,9 +62,7 @@ export class BookingNotifier implements BookingSubject {
         console.log('[BookingNotifier] Notification system initialized');
     }
 
-    /**
-     * Mendaftarkan observer baru
-     */
+    // Mendaftarkan observer baru
     attach(observer: BookingObserver): void {
         const name = observer.getName();
         if (this.observers.has(name)) {
@@ -137,9 +75,7 @@ export class BookingNotifier implements BookingSubject {
         console.log(`[BookingNotifier] Subscribes to: ${observer.getSubscribedEvents().join(', ')}`);
     }
 
-    /**
-     * Menghapus observer
-     */
+    // Menghapus observer
     detach(observer: BookingObserver): void {
         const name = observer.getName();
         if (this.observers.delete(name)) {
@@ -147,9 +83,7 @@ export class BookingNotifier implements BookingSubject {
         }
     }
 
-    /**
-     * Mengirim notifikasi ke semua observer yang subscribe ke event type
-     */
+    // Mengirim notifikasi ke semua observer yang subscribe ke event type
     notify(event: BookingEvent): void {
         console.log(`\n[BookingNotifier] ═══ Broadcasting: ${event.eventType} ═══`);
         console.log(`[BookingNotifier] Booking: ${event.bookingId}`);
@@ -180,27 +114,19 @@ export class BookingNotifier implements BookingSubject {
         }
     }
 
-    /**
-     * Mendapatkan daftar observer
-     */
+    // Mendapatkan daftar observer
     getObservers(): string[] {
         return Array.from(this.observers.keys());
     }
 
-    /**
-     * Mendapatkan log event
-     */
+    // Mendapatkan log event
     getEventLog(limit: number = 50): BookingEvent[] {
         return this.eventLog.slice(-limit);
     }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONCRETE OBSERVER 1: EmailNotificationObserver
- * ═══════════════════════════════════════════════════════════════
- * Mengirim notifikasi via email
- */
+// CONCRETE OBSERVER 1: EmailNotificationObserver
+// Mengirim notifikasi via email
 export class EmailNotificationObserver implements BookingObserver {
     private smtpConfig: { host: string; port: number };
 
@@ -337,12 +263,8 @@ interface EmailContent {
     body: string;
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONCRETE OBSERVER 2: SMSNotificationObserver
- * ═══════════════════════════════════════════════════════════════
- * Mengirim notifikasi via SMS
- */
+// CONCRETE OBSERVER 2: SMSNotificationObserver
+// Mengirim notifikasi via SMS
 export class SMSNotificationObserver implements BookingObserver {
     private smsGateway: string;
 
@@ -390,12 +312,8 @@ export class SMSNotificationObserver implements BookingObserver {
     }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONCRETE OBSERVER 3: PushNotificationObserver
- * ═══════════════════════════════════════════════════════════════
- * Mengirim push notification ke mobile app
- */
+// CONCRETE OBSERVER 3: PushNotificationObserver
+// Mengirim push notification ke mobile app
 export class PushNotificationObserver implements BookingObserver {
     private firebaseConfig: { projectId: string };
 
@@ -474,12 +392,8 @@ interface PushNotificationContent {
     icon: string;
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONCRETE OBSERVER 4: InventoryObserver
- * ═══════════════════════════════════════════════════════════════
- * Mengupdate inventory kursi
- */
+// CONCRETE OBSERVER 4: InventoryObserver
+// Mengupdate inventory kursi
 export class InventoryObserver implements BookingObserver {
     getName(): string {
         return 'InventorySystem';
@@ -518,12 +432,8 @@ export class InventoryObserver implements BookingObserver {
     }
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * CONCRETE OBSERVER 5: AnalyticsObserver
- * ═══════════════════════════════════════════════════════════════
- * Mencatat data untuk analytics
- */
+// CONCRETE OBSERVER 5: AnalyticsObserver
+// Mencatat data untuk analytics
 export class AnalyticsObserver implements BookingObserver {
     private analyticsData: AnalyticsEntry[] = [];
 
@@ -555,16 +465,12 @@ export class AnalyticsObserver implements BookingObserver {
         }
     }
 
-    /**
-     * Mendapatkan total revenue
-     */
+    // Mendapatkan total revenue
     getTotalRevenue(): number {
         return this.analyticsData.reduce((sum, entry) => sum + entry.revenue, 0);
     }
 
-    /**
-     * Mendapatkan statistik per film
-     */
+    // Mendapatkan statistik per film
     getMovieStats(): Map<string, number> {
         const stats = new Map<string, number>();
         for (const entry of this.analyticsData) {
@@ -585,12 +491,8 @@ interface AnalyticsEntry {
     timestamp: Date;
 }
 
-/**
- * ═══════════════════════════════════════════════════════════════
- * NOTIFICATION SERVICE FACADE
- * ═══════════════════════════════════════════════════════════════
- * Facade untuk memudahkan penggunaan notification system
- */
+// NOTIFICATION SERVICE FACADE
+// Facade untuk memudahkan penggunaan notification system
 export class NotificationManager {
     private notifier: BookingNotifier;
 
@@ -607,9 +509,7 @@ export class NotificationManager {
         this.notifier.attach(new AnalyticsObserver());
     }
 
-    /**
-     * Mengirim notifikasi booking created
-     */
+    // Mengirim notifikasi booking created
     notifyBookingCreated(
         bookingId: string,
         customerName: string,
@@ -636,9 +536,7 @@ export class NotificationManager {
         });
     }
 
-    /**
-     * Mengirim notifikasi pembayaran berhasil
-     */
+    // Mengirim notifikasi pembayaran berhasil
     notifyPaymentSuccess(event: Omit<BookingEvent, 'eventType' | 'timestamp'>): void {
         this.notifier.notify({
             ...event,
@@ -647,9 +545,7 @@ export class NotificationManager {
         });
     }
 
-    /**
-     * Mengirim notifikasi booking confirmed
-     */
+    // Mengirim notifikasi booking confirmed
     notifyBookingConfirmed(event: Omit<BookingEvent, 'eventType' | 'timestamp'>): void {
         this.notifier.notify({
             ...event,
@@ -658,9 +554,7 @@ export class NotificationManager {
         });
     }
 
-    /**
-     * Mengirim reminder
-     */
+    // Mengirim reminder
     sendReminder(event: Omit<BookingEvent, 'eventType' | 'timestamp'>, hoursBeforeShow: number): void {
         const eventType = hoursBeforeShow <= 1
             ? BookingEventType.REMINDER_1_HOUR
@@ -673,9 +567,7 @@ export class NotificationManager {
         });
     }
 
-    /**
-     * Mendapatkan notifier untuk kustomisasi
-     */
+    // Mendapatkan notifier untuk kustomisasi
     getNotifier(): BookingNotifier {
         return this.notifier;
     }

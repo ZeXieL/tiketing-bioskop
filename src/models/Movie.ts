@@ -1,7 +1,5 @@
-/**
- * Model Film
- * Merepresentasikan data film yang ditayangkan di bioskop
- */
+// Model Film
+// Merepresentasikan data film yang ditayangkan di bioskop
 export interface Movie {
     id: string;
     title: string;
@@ -13,9 +11,7 @@ export interface Movie {
     releaseDate: Date;
 }
 
-/**
- * Implementasi konkret Movie
- */
+// Implementasi konkret Movie
 export class MovieImpl implements Movie {
     constructor(
         public id: string,
@@ -28,9 +24,7 @@ export class MovieImpl implements Movie {
         public releaseDate: Date
     ) { }
 
-    /**
-     * Mendapatkan durasi dalam format jam:menit
-     */
+    // Mendapatkan durasi dalam format jam:menit
     getFormattedDuration(): string {
         const hours = Math.floor(this.duration / 60);
         const minutes = this.duration % 60;

@@ -1,14 +1,10 @@
-/**
- * Model Jadwal Tayang
- * Merepresentasikan jadwal tayang film di studio tertentu
- */
+// Model Jadwal Tayang
+// Merepresentasikan jadwal tayang film di studio tertentu
 
 import { Movie } from './Movie';
 import { Cinema, Studio } from './Cinema';
 
-/**
- * Interface Showtime
- */
+// Interface Showtime
 export interface Showtime {
     id: string;
     movie: Movie;
@@ -21,9 +17,7 @@ export interface Showtime {
     isPast(): boolean;
 }
 
-/**
- * Implementasi konkret Showtime
- */
+// Implementasi konkret Showtime
 export class ShowtimeImpl implements Showtime {
     constructor(
         public id: string,
@@ -36,9 +30,7 @@ export class ShowtimeImpl implements Showtime {
         public basePrice: number
     ) { }
 
-    /**
-     * Mendapatkan informasi jadwal lengkap
-     */
+    // Mendapatkan informasi jadwal lengkap
     getFullSchedule(): string {
         const dateStr = this.date.toLocaleDateString('id-ID', {
             weekday: 'long',
@@ -49,9 +41,7 @@ export class ShowtimeImpl implements Showtime {
         return `${this.movie.title} - ${dateStr} ${this.startTime}`;
     }
 
-    /**
-     * Mengecek apakah jadwal sudah lewat
-     */
+    // Mengecek apakah jadwal sudah lewat
     isPast(): boolean {
         const now = new Date();
         const showDateTime = new Date(this.date);

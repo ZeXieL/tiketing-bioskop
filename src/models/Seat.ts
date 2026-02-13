@@ -1,11 +1,7 @@
-/**
- * Model Kursi
- * Merepresentasikan kursi dalam studio bioskop
- */
+// Model Kursi
+// Merepresentasikan kursi dalam studio bioskop
 
-/**
- * Status kursi
- */
+// Status kursi
 export enum SeatStatus {
     AVAILABLE = 'AVAILABLE',
     SELECTED = 'SELECTED',
@@ -13,9 +9,7 @@ export enum SeatStatus {
     UNAVAILABLE = 'UNAVAILABLE'
 }
 
-/**
- * Tipe kursi
- */
+// Tipe kursi
 export enum SeatType {
     REGULAR = 'REGULAR',
     VIP = 'VIP',
@@ -23,9 +17,7 @@ export enum SeatType {
     WHEELCHAIR = 'WHEELCHAIR'
 }
 
-/**
- * Interface Seat
- */
+// Interface Seat
 export interface Seat {
     id: string;
     row: string;
@@ -37,9 +29,7 @@ export interface Seat {
     isAvailable(): boolean;
 }
 
-/**
- * Implementasi konkret Seat
- */
+// Implementasi konkret Seat
 export class SeatImpl implements Seat {
     constructor(
         public id: string,
@@ -50,41 +40,31 @@ export class SeatImpl implements Seat {
         public price: number = 0
     ) { }
 
-    /**
-     * Mendapatkan kode kursi (contoh: A1, B5)
-     */
+    // Mendapatkan kode kursi (contoh: A1, B5)
     getCode(): string {
         return `${this.row}${this.number}`;
     }
 
-    /**
-     * Mengecek apakah kursi tersedia
-     */
+    // Mengecek apakah kursi tersedia
     isAvailable(): boolean {
         return this.status === SeatStatus.AVAILABLE;
     }
 
-    /**
-     * Memilih kursi
-     */
+    // Memilih kursi
     select(): void {
         if (this.isAvailable()) {
             this.status = SeatStatus.SELECTED;
         }
     }
 
-    /**
-     * Membatalkan pilihan kursi
-     */
+    // Membatalkan pilihan kursi
     deselect(): void {
         if (this.status === SeatStatus.SELECTED) {
             this.status = SeatStatus.AVAILABLE;
         }
     }
 
-    /**
-     * Mem-booking kursi
-     */
+    // Mem-booking kursi
     book(): void {
         if (this.status === SeatStatus.SELECTED) {
             this.status = SeatStatus.BOOKED;

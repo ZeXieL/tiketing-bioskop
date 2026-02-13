@@ -1,29 +1,16 @@
-/**
- * =============================================================================
- * FACADE PATTERN - Layanan Booking Bioskop Terpadu
- * =============================================================================
- * 
- * PENJELASAN MASALAH:
- * Proses pemesanan tiket bioskop melibatkan banyak subsystem yang kompleks:
- * - MovieService: Mengelola data film dan jadwal tayang
- * - SeatService: Mengelola ketersediaan kursi
- * - PaymentService: Memproses pembayaran
- * - NotificationService: Mengirim notifikasi ke pengguna
- * 
- * Client harus berinteraksi dengan banyak objek dan memahami hubungan antar
- * subsystem, yang membuat kode client menjadi kompleks dan tightly coupled.
- * 
- * ALASAN PEMILIHAN:
- * Facade Pattern dipilih untuk menyediakan interface sederhana yang
- * menyembunyikan kompleksitas subsystem. Client cukup memanggil satu method
- * untuk menyelesaikan seluruh proses booking, tanpa perlu memahami detail
- * internal setiap subsystem.
- * 
- * PEMETAAN KE DOMAIN BIOSKOP:
- * - Facade: CinemaBookingService
- * - Subsystems: MovieService, SeatService, PaymentService, NotificationService
- * =============================================================================
- */
+// FACADE PATTERN - Layanan Booking Bioskop Terpadu
+//
+// PENJELASAN MASALAH:
+// Proses pemesanan tiket bioskop melibatkan banyak subsystem yang kompleks.
+// Client harus berinteraksi dengan banyak objek dan memahami hubungan antar subsystem.
+//
+// SOLUSI:
+// Facade Pattern menyediakan interface sederhana yang menyembunyikan kompleksitas subsystem.
+// Client cukup memanggil satu method untuk menyelesaikan seluruh proses booking.
+//
+// PEMETAAN KE DOMAIN BIOSKOP:
+// - Facade: CinemaBookingService
+// - Subsystems: MovieService, SeatService, PaymentService, NotificationService
 
 import { Movie, MovieImpl } from '../models/Movie';
 import { Cinema, Studio, StudioType, CinemaImpl, StudioImpl } from '../models/Cinema';
@@ -37,10 +24,8 @@ import { TicketType } from '../ticket/TicketFactory';
 // SUBSYSTEM 1: MovieService
 // =============================================================================
 
-/**
- * Subsystem: MovieService
- * Mengelola data film dan jadwal tayang
- */
+// Subsystem: MovieService
+// Mengelola data film dan jadwal tayang
 export class MovieService {
     private movies: Map<string, Movie> = new Map();
     private showtimes: Map<string, Showtime[]> = new Map();
@@ -65,23 +50,17 @@ export class MovieService {
         });
     }
 
-    /**
-     * Mendapatkan daftar semua film
-     */
+    // Mendapatkan daftar semua film
     getAllMovies(): Movie[] {
         return Array.from(this.movies.values());
     }
 
-    /**
-     * Mendapatkan film berdasarkan ID
-     */
+    // Mendapatkan film berdasarkan ID
     getMovieById(movieId: string): Movie | null {
         return this.movies.get(movieId) || null;
     }
 
-    /**
-     * Mencari film berdasarkan judul
-     */
+    // Mencari film berdasarkan judul
     searchMovies(query: string): Movie[] {
         const lowerQuery = query.toLowerCase();
         return this.getAllMovies().filter(movie =>
@@ -89,16 +68,12 @@ export class MovieService {
         );
     }
 
-    /**
-     * Mendapatkan jadwal tayang untuk film tertentu
-     */
+    // Mendapatkan jadwal tayang untuk film tertentu
     getShowtimes(movieId: string): Showtime[] {
         return this.showtimes.get(movieId) || [];
     }
 
-    /**
-     * Menambahkan jadwal tayang
-     */
+    // Menambahkan jadwal tayang
     addShowtime(showtime: Showtime): void {
         const movieId = showtime.movie.id;
         const existing = this.showtimes.get(movieId) || [];
@@ -106,9 +81,7 @@ export class MovieService {
         this.showtimes.set(movieId, existing);
     }
 
-    /**
-     * Log aktivitas
-     */
+    // Log aktivitas
     log(message: string): void {
         console.log(`[MovieService] ${message}`);
     }
@@ -118,18 +91,15 @@ export class MovieService {
 // SUBSYSTEM 2: SeatService
 // =============================================================================
 
-/**
- * Subsystem: SeatService
- * Mengelola ketersediaan dan pemilihan kursi
- */
+// Subsystem: SeatService
+// Mengelola ketersediaan dan pemilihan kursi
 export class SeatService {
     private seatLayouts: Map<string, Seat[][]> = new Map();
     private selectedSeats: Map<string, Set<string>> = new Map(); // showtimeId -> set of seat codes
 
-    /**
-     * Inisialisasi layout kursi untuk showtime
-     */
+    // Inisialisasi layout kursi untuk showtime
     initializeSeatLayout(showtimeId: string, rows: number, seatsPerRow: number): void {
+        if (this.seatLayouts.has(showtimeId)) return;
         const layout: Seat[][] = [];
         const rowLabels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
@@ -153,24 +123,18 @@ export class SeatService {
         this.selectedSeats.set(showtimeId, new Set());
     }
 
-    /**
-     * Mendapatkan semua kursi untuk showtime
-     */
+    // Mendapatkan semua kursi untuk showtime
     getSeats(showtimeId: string): Seat[][] {
         return this.seatLayouts.get(showtimeId) || [];
     }
 
-    /**
-     * Mendapatkan kursi yang tersedia
-     */
+    // Mendapatkan kursi yang tersedia
     getAvailableSeats(showtimeId: string): Seat[] {
         const layout = this.seatLayouts.get(showtimeId) || [];
         return layout.flat().filter(seat => seat.status === SeatStatus.AVAILABLE);
     }
 
-    /**
-     * Mendapatkan kursi berdasarkan kode
-     */
+    // Mendapatkan kursi berdasarkan kode
     getSeat(showtimeId: string, seatCode: string): Seat | null {
         const layout = this.seatLayouts.get(showtimeId) || [];
         for (const row of layout) {
@@ -183,9 +147,7 @@ export class SeatService {
         return null;
     }
 
-    /**
-     * Memilih kursi
-     */
+    // Memilih kursi
     selectSeat(showtimeId: string, seatCode: string): boolean {
         const seat = this.getSeat(showtimeId, seatCode);
         if (seat && seat.isAvailable()) {
@@ -198,9 +160,7 @@ export class SeatService {
         return false;
     }
 
-    /**
-     * Membatalkan pilihan kursi
-     */
+    // Membatalkan pilihan kursi
     deselectSeat(showtimeId: string, seatCode: string): boolean {
         const seat = this.getSeat(showtimeId, seatCode);
         if (seat && seat.status === SeatStatus.SELECTED) {
@@ -212,9 +172,7 @@ export class SeatService {
         return false;
     }
 
-    /**
-     * Mem-booking kursi yang dipilih
-     */
+    // Mem-booking kursi yang dipilih
     bookSelectedSeats(showtimeId: string): Seat[] {
         const selectedCodes = this.selectedSeats.get(showtimeId) || new Set();
         const bookedSeats: Seat[] = [];
@@ -232,9 +190,7 @@ export class SeatService {
         return bookedSeats;
     }
 
-    /**
-     * Log aktivitas
-     */
+    // Log aktivitas
     log(message: string): void {
         console.log(`[SeatService] ${message}`);
     }
@@ -244,9 +200,7 @@ export class SeatService {
 // SUBSYSTEM 3: PaymentService
 // =============================================================================
 
-/**
- * Status pembayaran
- */
+// Status pembayaran
 export enum PaymentStatus {
     PENDING = 'PENDING',
     PROCESSING = 'PROCESSING',
@@ -255,9 +209,7 @@ export enum PaymentStatus {
     REFUNDED = 'REFUNDED'
 }
 
-/**
- * Interface hasil pembayaran
- */
+// Interface hasil pembayaran
 export interface PaymentResult {
     transactionId: string;
     status: PaymentStatus;
@@ -266,16 +218,12 @@ export interface PaymentResult {
     message: string;
 }
 
-/**
- * Subsystem: PaymentService
- * Memproses pembayaran
- */
+// Subsystem: PaymentService
+// Memproses pembayaran
 export class PaymentService {
     private transactions: Map<string, PaymentResult> = new Map();
 
-    /**
-     * Memproses pembayaran
-     */
+    // Memproses pembayaran
     processPayment(bookingId: string, amount: number, paymentMethod: string): PaymentResult {
         this.log(`Memproses pembayaran ${bookingId} sebesar Rp ${amount.toLocaleString('id-ID')}`);
 
@@ -301,16 +249,12 @@ export class PaymentService {
         return result;
     }
 
-    /**
-     * Mendapatkan detail transaksi
-     */
+    // Mendapatkan detail transaksi
     getTransaction(transactionId: string): PaymentResult | null {
         return this.transactions.get(transactionId) || null;
     }
 
-    /**
-     * Memproses refund
-     */
+    // Memproses refund
     refund(transactionId: string): PaymentResult | null {
         const original = this.transactions.get(transactionId);
         if (original && original.status === PaymentStatus.SUCCESS) {
@@ -337,28 +281,22 @@ export class PaymentService {
 // SUBSYSTEM 4: NotificationService
 // =============================================================================
 
-/**
- * Tipe notifikasi
- */
+// Tipe notifikasi
 export enum NotificationType {
     EMAIL = 'EMAIL',
     SMS = 'SMS',
     PUSH = 'PUSH'
 }
 
-/**
- * Subsystem: NotificationService
- * Mengirim notifikasi ke pengguna
- */
+// Subsystem: NotificationService
+// Mengirim notifikasi ke pengguna
 export class NotificationService {
-    /**
-     * Mengirim email konfirmasi booking
-     */
+    // Mengirim email konfirmasi booking
     sendBookingConfirmation(user: User, booking: Booking): void {
         this.log(`Mengirim email konfirmasi ke ${user.email}`);
         console.log(`
     ══════════════════════════════════════════════════════════════
-    📧 EMAIL NOTIFIKASI
+    EMAIL NOTIFIKASI
     ══════════════════════════════════════════════════════════════
     Kepada: ${user.name} <${user.email}>
     Subjek: Konfirmasi Booking #${booking.id}
@@ -383,14 +321,12 @@ export class NotificationService {
     `);
     }
 
-    /**
-     * Mengirim SMS reminder
-     */
+    // Mengirim SMS reminder
     sendReminder(user: User, booking: Booking, hoursBeforeShow: number): void {
         this.log(`Mengirim SMS ke ${user.phone}`);
         console.log(`
     ══════════════════════════════════════════════════════════════
-    📱 SMS NOTIFIKASI
+    SMS NOTIFIKASI
     ══════════════════════════════════════════════════════════════
     To: ${user.phone}
     
@@ -400,14 +336,12 @@ export class NotificationService {
     `);
     }
 
-    /**
-     * Mengirim notifikasi pembayaran berhasil
-     */
+    // Mengirim notifikasi pembayaran berhasil
     sendPaymentSuccess(user: User, booking: Booking, transactionId: string): void {
         this.log(`Mengirim notifikasi pembayaran ke ${user.email}`);
         console.log(`
     ══════════════════════════════════════════════════════════════
-    ✅ PEMBAYARAN BERHASIL
+    PEMBAYARAN BERHASIL
     ══════════════════════════════════════════════════════════════
     ID Transaksi: ${transactionId}
     Booking: ${booking.id}
@@ -416,9 +350,7 @@ export class NotificationService {
     `);
     }
 
-    /**
-     * Mengirim notifikasi pembatalan
-     */
+    // Mengirim notifikasi pembatalan
     sendCancellation(user: User, booking: Booking): void {
         this.log(`Mengirim notifikasi pembatalan ke ${user.email}`);
     }
@@ -432,9 +364,7 @@ export class NotificationService {
 // FACADE: CinemaBookingService
 // =============================================================================
 
-/**
- * Hasil proses booking lengkap
- */
+// Hasil proses booking lengkap
 export interface BookingResult {
     success: boolean;
     booking?: Booking;
@@ -442,10 +372,8 @@ export interface BookingResult {
     message: string;
 }
 
-/**
- * FACADE: CinemaBookingService
- * Menyediakan interface sederhana untuk keseluruhan proses booking
- */
+// FACADE: CinemaBookingService
+// Menyediakan interface sederhana untuk keseluruhan proses booking
 export class CinemaBookingService {
     private movieService: MovieService;
     private seatService: SeatService;
@@ -462,21 +390,16 @@ export class CinemaBookingService {
         console.log('[CinemaBookingService] Facade siap digunakan');
     }
 
-    /**
-     * ═══════════════════════════════════════════════════════════════
-     * FACADE METHOD: completeBooking
-     * ═══════════════════════════════════════════════════════════════
-     * Method utama yang menyederhanakan seluruh proses booking kompleks
-     * menjadi satu panggilan method.
-     * 
-     * Langkah-langkah internal:
-     * 1. Validasi film dan jadwal
-     * 2. Cek ketersediaan kursi
-     * 3. Pilih kursi
-     * 4. Buat booking
-     * 5. Proses pembayaran
-     * 6. Kirim notifikasi
-     */
+    // FACADE METHOD: completeBooking
+    // Method utama yang menyederhanakan seluruh proses booking kompleks menjadi satu panggilan method.
+    //
+    // Langkah-langkah internal:
+    // 1. Validasi film dan jadwal
+    // 2. Cek ketersediaan kursi
+    // 3. Pilih kursi
+    // 4. Buat booking
+    // 5. Proses pembayaran
+    // 6. Kirim notifikasi
     completeBooking(
         user: User,
         showtimeId: string,
@@ -584,9 +507,7 @@ export class CinemaBookingService {
         }
     }
 
-    /**
-     * Method tambahan untuk operasi sederhana
-     */
+    // Method tambahan untuk operasi sederhana
 
     getAvailableMovies(): Movie[] {
         return this.movieService.getAllMovies();
@@ -604,9 +525,7 @@ export class CinemaBookingService {
         return this.seatService.getAvailableSeats(showtimeId);
     }
 
-    /**
-     * Membatalkan booking
-     */
+    // Membatalkan booking
     cancelBooking(booking: Booking, transactionId: string): boolean {
         if (booking.user) {
             // Refund pembayaran
