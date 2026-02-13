@@ -162,7 +162,7 @@ Setiap implementasi pattern mencakup:
 
 ## Kontributor
 
-- [Nama Anda]
+- 
 
 ## Lisensi
 
@@ -170,4 +170,8 @@ Proyek ini dibuat untuk keperluan tugas besar mata kuliah.
 
 ---
 
+<<<<<<< HEAD
 *Dibuat dengan cinta untuk pembelajaran Design Patterns*
+=======
+*Dibuat untuk pembelajaran Design Patterns*
+>>>>>>> 2f6dd62cbffe9083a7526a341401f4f8b8bdf2fc
