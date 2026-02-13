@@ -136,23 +136,6 @@ controller.undo(); // Batalkan A2
 controller.redo(); // Pilih kembali A2
 ```
 
-## Diagram
-
-Setiap pattern dilengkapi dengan:
-- Class Diagram
-- Sequence Diagram (untuk behavioral patterns)
-
-Lihat folder `diagrams/` untuk UML diagrams.
-
-## Catatan Akademik
-
-Setiap implementasi pattern mencakup:
-1. **Penjelasan Masalah** - Mengapa pattern diperlukan
-2. **Alasan Pemilihan** - Mengapa pattern ini sesuai
-3. **Pemetaan ke Domain** - Bagaimana pattern diterapkan ke konteks bioskop
-4. **Kelebihan** - Manfaat dari penggunaan pattern
-5. **Kode yang Terdokumentasi** - Dengan komentar
-
 ## Teknologi
 
 - **TypeScript** - Static typing & OOP support
@@ -162,16 +145,7 @@ Setiap implementasi pattern mencakup:
 
 ## Kontributor
 
-- 
-
-## Lisensi
-
-Proyek ini dibuat untuk keperluan tugas besar mata kuliah.
-
----
-
-<<<<<<< HEAD
-*Dibuat dengan cinta untuk pembelajaran Design Patterns*
-=======
-*Dibuat untuk pembelajaran Design Patterns*
->>>>>>> 2f6dd62cbffe9083a7526a341401f4f8b8bdf2fc
+- 10122180 – Firman Nurilhaq
+- 10122290 – Muhamad Haerul Anwar
+- 10122286 – Didan Rahmana Putra
+- 10122168 – Zulfiqar Galih Senapati
